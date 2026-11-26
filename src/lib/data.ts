@@ -1,5 +1,6 @@
 import type {
   CartItem,
+  Coupon,
   Extra,
   Ingredient,
   Neighborhood,
@@ -8,8 +9,45 @@ import type {
   Section,
   SharedState,
   SizeId,
+  StoreSettings,
   TintKey,
 } from "./types";
+
+export const STATE_VERSION = 3;
+
+export const SEED_SETTINGS: StoreSettings = {
+  name: "Batatas da Val",
+  slogan: "Crocante por fora, cremosa por dentro",
+  city: "Três Cachoeiras - RS",
+  address: "Três Cachoeiras - RS",
+  phone: "(51) 9687-0865",
+  whatsapp: "555196870865",
+  instagram: "@batatasval",
+  pixKey: "51968700865",
+  pixName: "Batatas da Val",
+  pixCity: "TRES CACHOEIRAS",
+  hours: {
+    0: { open: true, from: "19:30", to: "23:30" },
+    1: { open: false, from: "19:30", to: "23:30" },
+    2: { open: false, from: "19:30", to: "23:30" },
+    3: { open: true, from: "19:30", to: "23:30" },
+    4: { open: true, from: "19:30", to: "23:30" },
+    5: { open: true, from: "19:30", to: "00:30" },
+    6: { open: true, from: "19:30", to: "00:30" },
+  },
+  paused: false,
+  pausedMessage: "Estamos com a cozinha lotada. Já voltamos a aceitar pedidos!",
+  minOrder: 0,
+  prepMinutes: 25,
+  notices: [
+    {
+      id: "demanda",
+      text: "Sexta e sábado a cozinha enche: os pedidos podem levar um pouco mais.",
+      tone: "aviso",
+      active: false,
+    },
+  ],
+};
 
 export const SEED_SECTIONS: Section[] = [
   { id: "tradicionais", name: "Batatões Tradicionais", icon: "flame", active: true, order: 0 },
@@ -26,28 +64,32 @@ export const SIZES: { id: SizeId; label: string; weight: string }[] = [
   { id: "gigante", label: "Batatão Gigante", weight: "800g" },
 ];
 
-export const EXTRAS: Extra[] = [
-  { id: "bacon", name: "Bacon Crocante", price: 6, ingredient: "bacon", amount: 0.08 },
-  { id: "cheddar", name: "Cheddar Cremoso", price: 5, ingredient: "cheddar", amount: 0.08 },
-  { id: "catupiry", name: "Catupiry Original", price: 5, ingredient: "catupiry", amount: 0.08 },
-  { id: "palha", name: "Batata Palha Extra", price: 3, ingredient: "palha", amount: 0.25 },
-  { id: "mussarela", name: "Queijo Mussarela", price: 5, ingredient: "mussarela", amount: 0.08 },
+export const SEED_EXTRAS: Extra[] = [
+  { id: "bacon", name: "Bacon Crocante", price: 6, ingredient: "bacon", amount: 0.08, active: true },
+  { id: "cheddar", name: "Cheddar Cremoso", price: 5, ingredient: "cheddar", amount: 0.08, active: true },
+  { id: "catupiry", name: "Catupiry Original", price: 5, ingredient: "catupiry", amount: 0.08, active: true },
+  { id: "palha", name: "Batata Palha Extra", price: 3, ingredient: "palha", amount: 0.25, active: true },
+  { id: "mussarela", name: "Queijo Mussarela", price: 5, ingredient: "mussarela", amount: 0.08, active: true },
 ];
 
-export const NEIGHBORHOODS: Neighborhood[] = [
-  { id: "centro", name: "Centro", hint: "Três Cachoeiras", fee: 5, eta: "30–40 min" },
-  { id: "proximos", name: "Bairros próximos", hint: "Até 3 km do centro", fee: 7, eta: "35–50 min" },
-  { id: "interior", name: "Interior / Outros", hint: "Localidades do interior", fee: 10, eta: "45–60 min" },
-  { id: "retirada", name: "Retirada no local", hint: "Busque quentinho!", fee: 0, eta: "20–25 min", pickup: true },
+export const SEED_NEIGHBORHOODS: Neighborhood[] = [
+  { id: "centro", name: "Centro", hint: "Três Cachoeiras", fee: 5, etaMin: 30, etaMax: 40, active: true, order: 0 },
+  { id: "proximos", name: "Bairros próximos", hint: "Até 3 km do centro", fee: 7, etaMin: 35, etaMax: 50, active: true, order: 1 },
+  { id: "interior", name: "Interior / Outros", hint: "Localidades do interior", fee: 10, etaMin: 45, etaMax: 60, active: true, order: 2 },
+  { id: "retirada", name: "Retirada no local", hint: "Busque quentinho", fee: 0, etaMin: 20, etaMax: 25, pickup: true, active: true, order: 3 },
+];
+
+export const SEED_COUPONS: Coupon[] = [
+  { id: "primeira", code: "PRIMEIRA10", kind: "percent", value: 10, minOrder: 30, maxUses: 0, uses: 0, expiresAt: null, active: false },
 ];
 
 /** Fundos da vitrine de cada produto. */
 export const TINTS: Record<TintKey, { label: string; cls: string; swatch: string }> = {
-  gold: { label: "Dourado", cls: "from-amber-500/30 via-orange-600/20 to-transparent", swatch: "#F59E0B" },
-  red: { label: "Brasa", cls: "from-rose-600/30 via-red-700/20 to-transparent", swatch: "#E11D48" },
-  cream: { label: "Creme", cls: "from-yellow-200/25 via-amber-500/15 to-transparent", swatch: "#FDE68A" },
-  bev: { label: "Gelado", cls: "from-sky-500/20 via-rose-500/15 to-transparent", swatch: "#38BDF8" },
-  green: { label: "Fresco", cls: "from-lime-500/20 via-emerald-700/15 to-transparent", swatch: "#84CC16" },
+  gold: { label: "Dourado", cls: "from-amber-400/35 to-amber-800/15", swatch: "#F2A200" },
+  red: { label: "Brasa", cls: "from-red-500/40 to-red-900/20", swatch: "#D5321F" },
+  cream: { label: "Creme", cls: "from-amber-100/35 to-amber-400/10", swatch: "#F6E0A8" },
+  bev: { label: "Gelado", cls: "from-sky-400/35 to-sky-800/15", swatch: "#38BDF8" },
+  green: { label: "Fresco", cls: "from-lime-400/35 to-emerald-800/15", swatch: "#84CC16" },
 };
 
 export const SEED_PRODUCTS: Product[] = [
@@ -191,7 +233,7 @@ export const SEED_PRODUCTS: Product[] = [
   {
     id: "molho-casa",
     name: "Pote de Maionese da Casa",
-    description: "Maionese temperada artesanal da Val (100ml). Viciante!",
+    description: "Maionese temperada artesanal da Val (100ml).",
     category: "porcoes",
     price: 4,
     badges: [],
@@ -320,14 +362,6 @@ export const SEED_PRODUCTS: Product[] = [
   },
 ];
 
-export const findProduct = (products: Product[], id: string) => products.find((p) => p.id === id);
-export const extraById = (id: string) => EXTRAS.find((e) => e.id === id);
-export const neighborhoodById = (id: string | null) => NEIGHBORHOODS.find((n) => n.id === id);
-
-export const unitPriceFor = (p: Product, size: SizeId | undefined, extras: string[]) =>
-  (size === "gigante" && p.priceGigante ? p.priceGigante : p.price) +
-  extras.reduce((s, id) => s + (extraById(id)?.price ?? 0), 0);
-
 export const INITIAL_STOCK: Ingredient[] = [
   { id: "batata", name: "Batata Inglesa", unit: "kg", qty: 38, min: 10, max: 50, step: 1 },
   { id: "strogonoff", name: "Strogonoff de Carne", unit: "kg", qty: 7.5, min: 2, max: 10, step: 0.5 },
@@ -340,9 +374,45 @@ export const INITIAL_STOCK: Ingredient[] = [
   { id: "embalagem", name: "Embalagens Térmicas", unit: "un", qty: 160, min: 40, max: 200, step: 10 },
 ];
 
+/* ------------------------------------------------------------------ *
+ * Buscas e regras puras (sem estado global — recebem as listas)
+ * ------------------------------------------------------------------ */
+
+export const findProduct = (products: Product[], id: string) => products.find((p) => p.id === id);
+export const findExtra = (extras: Extra[], id: string) => extras.find((e) => e.id === id);
+export const findNeighborhood = (list: Neighborhood[], id: string | null | undefined) =>
+  list.find((n) => n.id === id);
+
+export const etaLabel = (n: Pick<Neighborhood, "etaMin" | "etaMax">) => `${n.etaMin}–${n.etaMax} min`;
+
+export const unitPriceFor = (p: Product, size: SizeId | undefined, extras: string[], list: Extra[]) =>
+  (size === "gigante" && p.priceGigante ? p.priceGigante : p.price) +
+  extras.reduce((s, id) => s + (findExtra(list, id)?.price ?? 0), 0);
+
 export type StockLevel = "ok" | "atencao" | "critico";
 export const stockLevel = (i: Ingredient): StockLevel =>
   i.qty < i.min ? "critico" : i.qty < i.min * 2 ? "atencao" : "ok";
+
+/** Insumos consumidos por um pedido (receita × quantidade + adicionais). */
+export function orderConsumption(o: Order, products: Product[], extras: Extra[]) {
+  const use: Record<string, number> = {};
+  const add = (id: string, v: number) => (use[id] = (use[id] ?? 0) + v);
+  for (const it of o.items) {
+    const p = findProduct(products, it.productId);
+    if (!p) continue;
+    const recipe = it.size === "gigante" && p.recipeGigante ? p.recipeGigante : p.recipe;
+    for (const [k, v] of Object.entries(recipe)) add(k, (v ?? 0) * it.qty);
+    for (const ex of it.extras) {
+      const e = findExtra(extras, ex);
+      if (e) add(e.ingredient, e.amount * it.qty);
+    }
+  }
+  return use;
+}
+
+/* ------------------------------------------------------------------ *
+ * Seed inicial
+ * ------------------------------------------------------------------ */
 
 function item(productId: string, qty: number, size?: SizeId, extras: string[] = [], notes = ""): CartItem {
   const p = findProduct(SEED_PRODUCTS, productId)!;
@@ -354,7 +424,7 @@ function item(productId: string, qty: number, size?: SizeId, extras: string[] = 
     extras,
     notes,
     qty,
-    unitPrice: unitPriceFor(p, size, extras),
+    unitPrice: unitPriceFor(p, size, extras, SEED_EXTRAS),
   };
 }
 
@@ -369,10 +439,11 @@ function order(
   changeFor?: number,
 ): Order {
   const subtotal = items.reduce((s, i) => s + i.unitPrice * i.qty, 0);
-  const deliveryFee = neighborhoodById(neighborhoodId)?.fee ?? 0;
+  const deliveryFee = findNeighborhood(SEED_NEIGHBORHOODS, neighborhoodId)?.fee ?? 0;
   const t = Date.now() - minutesAgo * 60000;
   return {
     id,
+    token: `seed${id}`,
     createdAt: t,
     updatedAt: t,
     customer,
@@ -380,25 +451,31 @@ function order(
     items,
     subtotal,
     deliveryFee,
+    discount: 0,
     total: subtotal + deliveryFee,
     payment,
     changeFor,
     status,
     stockDeducted: status !== "novo",
+    history: [{ status: "novo", at: t }],
   };
 }
-
-export const STATE_VERSION = 2;
 
 export function createSeed(): SharedState {
   return {
     version: STATE_VERSION,
     nextOrderId: 1046,
-    openingFloat: 100,
     stock: INITIAL_STOCK.map((i) => ({ ...i })),
     cash: [],
+    shifts: [{ id: "turno-inicial", openedAt: Date.now(), openedBy: "sistema", openingFloat: 100 }],
     sections: SEED_SECTIONS.map((x) => ({ ...x })),
     products: SEED_PRODUCTS.map((x) => ({ ...x })),
+    extras: SEED_EXTRAS.map((x) => ({ ...x })),
+    neighborhoods: SEED_NEIGHBORHOODS.map((x) => ({ ...x })),
+    coupons: SEED_COUPONS.map((x) => ({ ...x })),
+    settings: structuredClone(SEED_SETTINGS),
+    users: [],
+    audit: [],
     orders: [
       order(
         1042,
@@ -439,21 +516,4 @@ export function createSeed(): SharedState {
       ),
     ],
   };
-}
-
-/** Insumos consumidos por um pedido (receita × quantidade + adicionais). */
-export function orderConsumption(o: Order, products: Product[]) {
-  const use: Partial<Record<Ingredient["id"], number>> = {};
-  const add = (id: Ingredient["id"], v: number) => (use[id] = (use[id] ?? 0) + v);
-  for (const it of o.items) {
-    const p = findProduct(products, it.productId);
-    if (!p) continue;
-    const recipe = it.size === "gigante" && p.recipeGigante ? p.recipeGigante : p.recipe;
-    for (const [k, v] of Object.entries(recipe)) add(k as Ingredient["id"], (v ?? 0) * it.qty);
-    for (const ex of it.extras) {
-      const e = extraById(ex);
-      if (e) add(e.ingredient, e.amount * it.qty);
-    }
-  }
-  return use;
 }

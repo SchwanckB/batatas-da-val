@@ -28,7 +28,7 @@ export function QtyStepper({
         disabled={!trashAtMin && value <= min}
         onClick={() => onChange(value - 1)}
         aria-label={showTrash ? "Remover" : "Diminuir"}
-        className={cn(btn, "grid place-items-center rounded-full text-zinc-200 transition hover:bg-white/10 disabled:opacity-30", showTrash && "text-rose-300")}
+        className={cn(btn, "grid place-items-center rounded-full text-zinc-200 transition hover:bg-white/10 disabled:opacity-30", showTrash && "text-brasa")}
       >
         {showTrash ? <Trash2 className="h-4 w-4" /> : <Minus className="h-4 w-4" />}
       </motion.button>

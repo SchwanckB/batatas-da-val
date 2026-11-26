@@ -13,7 +13,8 @@ import { SECTION_ICONS } from "@/components/ui/sectionIcons";
 import { TINTS } from "@/lib/data";
 import { cn, money, uid } from "@/lib/format";
 import { resizeImage } from "@/lib/image";
-import { useStore } from "@/lib/store";
+import { useAdmin, useAdminActions } from "@/lib/adminStore";
+import { useToast } from "@/lib/toast";
 import type { Badge, DishArtSpec, IngredientId, Product, Recipe, TintKey, Topping } from "@/lib/types";
 
 const BADGES: Badge[] = ["Mais Pedido", "Novo", "Serve 2 pessoas", "Especial da Casa"];
@@ -71,7 +72,9 @@ const scaleRecipe = (r: Recipe, k: number): Recipe =>
   Object.fromEntries(Object.entries(r).map(([id, v]) => [id, id === "embalagem" ? v : Math.round((v ?? 0) * k * 100) / 100]));
 
 export function ProductEditor({ product, onClose }: { product: Product | null; onClose: () => void }) {
-  const { shared, saveProduct, deleteProduct, toast } = useStore();
+  const { state: shared } = useAdmin();
+  const { saveProduct, deleteProduct } = useAdminActions();
+  const { toast } = useToast();
   const [d, setD] = useState<Product | null>(product);
   const [confirmDel, setConfirmDel] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -87,7 +90,7 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
   const set = (patch: Partial<Product>) => setD((x) => (x ? { ...x, ...patch } : x));
   const setArt = (patch: Partial<DishArtSpec>) => setD((x) => (x ? { ...x, art: { ...x.art, ...patch } as DishArtSpec } : x));
 
-  const save = () => {
+  const save = async () => {
     if (!d) return;
     const e: Record<string, string> = {};
     if (d.name.trim().length < 2) e.name = "Dê um nome ao produto";
@@ -102,17 +105,30 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
       description: d.description.trim(),
       recipeGigante: d.priceGigante ? scaleRecipe(d.recipe, 1.6) : undefined,
     };
-    saveProduct(final);
-    toast({ title: isNew ? "Produto criado" : "Produto atualizado", subtitle: final.name, icon: <Check className="h-4.5 w-4.5 text-emerald-300" /> });
     onClose();
+    const err = await saveProduct(final);
+    toast(
+      err
+        ? { title: "Não salvou", subtitle: err, tone: "erro" }
+        : {
+            title: isNew ? "Produto criado" : "Produto atualizado",
+            subtitle: final.name,
+            icon: <Check className="h-4.5 w-4.5 text-[#7fd79a]" />,
+          },
+    );
   };
 
-  const remove = () => {
+  const remove = async () => {
     if (!d) return;
     if (!confirmDel) return setConfirmDel(true);
-    deleteProduct(d.id);
-    toast({ title: "Produto excluído", subtitle: d.name, icon: <Trash2 className="h-4.5 w-4.5 text-rose-300" /> });
+    const name = d.name;
     onClose();
+    const err = await deleteProduct(d.id);
+    toast(
+      err
+        ? { title: "Não excluiu", subtitle: err, tone: "erro" }
+        : { title: "Produto excluído", subtitle: name, icon: <Trash2 className="h-4.5 w-4.5 text-brasa" /> },
+    );
   };
 
   const onPhoto = async (f?: File) => {
@@ -120,14 +136,14 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
     try {
       set({ image: await resizeImage(f) });
     } catch {
-      toast({ title: "Não foi possível ler a imagem", subtitle: "Use JPG ou PNG", icon: <X className="h-4.5 w-4.5 text-rose-300" /> });
+      toast({ title: "Não foi possível ler a imagem", subtitle: "Use JPG ou PNG", tone: "erro", icon: <X className="h-4.5 w-4.5" /> });
     }
   };
 
   const input = (k?: string) =>
     cn(
-      "w-full rounded-control bg-white/[0.04] px-4 py-3 text-white ring-1 placeholder:text-zinc-500 focus:outline-none focus:ring-2",
-      k && errors[k] ? "ring-rose-500/60" : "ring-white/10 focus:ring-amber-400/40",
+      "w-full rounded-control border bg-ink px-4 py-3 text-white placeholder:text-zinc-500 transition-colors focus:outline-none",
+      k && errors[k] ? "border-brasa" : "border-line focus:border-amber-400/60",
     );
 
   const sections = [...shared.sections].sort((a, b) => a.order - b.order);
@@ -140,8 +156,8 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
             <div className="grid gap-6 p-5 pt-4 sm:p-6 md:grid-cols-[300px_1fr]">
               {/* Prévia + aparência */}
               <aside className="space-y-4 md:sticky md:top-0 md:self-start">
-                <h2 className="pr-10 text-xl font-extrabold tracking-tight text-white">{isNew ? "Novo produto" : "Editar produto"}</h2>
-                <div className="glass overflow-hidden rounded-card p-3">
+                <h2 className="letreiro pr-10 text-2xl text-white">{isNew ? "Novo produto" : "Editar produto"}</h2>
+                <div className="panel overflow-hidden rounded-card p-3">
                   <ProductArt product={d} className="h-44 w-full rounded-control" big />
                   <div className="px-1 pb-1 pt-3">
                     {d.badges.length > 0 && (
@@ -152,8 +168,8 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
                       </div>
                     )}
                     <p className="font-bold text-white">{d.name || "Nome do produto"}</p>
-                    <p className="mt-0.5 line-clamp-2 text-small text-zinc-400">{d.description || "Descrição apetitosa aparece aqui."}</p>
-                    <p className="mt-2 text-lg font-extrabold text-amber-300">{money(d.price || 0)}</p>
+                    <p className="mt-0.5 line-clamp-2 text-small text-zinc-400">{d.description || "A descrição do produto aparece aqui."}</p>
+                    <p className="mt-2 text-lg font-bold tnum text-amber-300">{money(d.price || 0)}</p>
                   </div>
                 </div>
 
@@ -161,7 +177,7 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
                   <Label>Foto (opcional)</Label>
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => onPhoto(e.target.files?.[0])} />
                   <div className="flex gap-2">
-                    <Press type="button" variant="glass" className="h-10 flex-1 text-sm" onClick={() => fileRef.current?.click()}>
+                    <Press type="button" variant="panel" className="h-10 flex-1 text-sm" onClick={() => fileRef.current?.click()}>
                       <ImagePlus className="h-4 w-4" /> {d.image ? "Trocar foto" : "Enviar foto"}
                     </Press>
                     {d.image && (
@@ -184,7 +200,7 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
                               key={a.key}
                               type="button"
                               onClick={() => set({ art: a.spec })}
-                              className={cn("flex flex-col items-center gap-0.5 rounded-control p-1.5 ring-1 transition", on ? "bg-amber-400/10 ring-amber-400/50" : "bg-white/[0.03] ring-white/10 hover:bg-white/[0.06]")}
+                              className={cn("flex flex-col items-center gap-0.5 rounded-control border p-1.5 transition-colors", on ? "border-amber-400/60 bg-amber-400/10" : "border-line hover:border-amber-400/35")}
                             >
                               <DishArt spec={a.spec} steam={false} className="h-10 w-10" />
                               <span className="text-2xs text-zinc-300">{a.label}</span>
@@ -221,7 +237,7 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
                       const Icon = SECTION_ICONS[s.icon]?.Icon ?? SECTION_ICONS.star.Icon;
                       const on = d.category === s.id;
                       return (
-                        <button key={s.id} type="button" onClick={() => set({ category: s.id })} className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold ring-1 transition", on ? "bg-amber-400 text-on-brand ring-amber-300" : "bg-white/[0.04] text-zinc-300 ring-white/10 hover:bg-white/[0.08]")}>
+                        <button key={s.id} type="button" onClick={() => set({ category: s.id })} className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-colors", on ? "bg-gold text-on-brand" : "border border-line text-zinc-300 hover:border-amber-400/40")}>
                           <Icon className="h-3.5 w-3.5" /> {s.name}
                           {!s.active && <span className={cn("text-2xs font-medium", on ? "text-on-brand/70" : "text-zinc-500")}>(oculta)</span>}
                         </button>
@@ -261,16 +277,16 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
                   </div>
                 </Field>
 
-                <div className="divide-y divide-white/[0.06] rounded-card bg-white/[0.03] ring-1 ring-white/10">
+                <div className="divide-y divide-line rounded-card border border-line">
                   <Toggle title="Disponível para venda" sub="Desligado, aparece como Esgotado" checked={d.available} onChange={(v) => set({ available: v })} />
                   <Toggle title="Destaque em “Mais Pedidos”" sub="Mostra no carrossel do topo" checked={!!d.featured} onChange={(v) => set({ featured: v })} />
-                  <Toggle title="Permitir adicionais" sub="Bacon, cheddar, catupiry, palha, mussarela" checked={d.allowsExtras} onChange={(v) => set({ allowsExtras: v })} />
+                  <Toggle title="Permitir adicionais" sub="Deixa o cliente escolher os extras do cardápio" checked={d.allowsExtras} onChange={(v) => set({ allowsExtras: v })} />
                 </div>
 
                 <Field label="Ficha técnica — baixa automática no estoque (por unidade)">
                   <div className="grid gap-2 sm:grid-cols-2">
                     {shared.stock.map((ing) => (
-                      <label key={ing.id} className="flex items-center gap-2 rounded-control bg-white/[0.03] px-3 py-2 ring-1 ring-white/10">
+                      <label key={ing.id} className="flex items-center gap-2 rounded-control border border-line px-3 py-2">
                         <span className="min-w-0 flex-1 truncate text-small text-zinc-300">{ing.name}</span>
                         <input
                           type="number"
@@ -286,7 +302,7 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
                             else recipe[ing.id as IngredientId] = v;
                             set({ recipe });
                           }}
-                          className="w-16 rounded-lg bg-black/30 px-2 py-1 text-right text-sm text-white ring-1 ring-white/10 focus:outline-none focus:ring-amber-400/40"
+                          className="w-16 rounded border border-line bg-ink px-2 py-1 text-right text-sm tnum text-white focus:border-amber-400/60 focus:outline-none"
                         />
                         <span className="w-6 text-2xs text-zinc-400">{ing.unit}</span>
                       </label>
@@ -298,9 +314,9 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 border-t border-white/10 bg-black/20 p-4 sm:px-6">
+          <div className="flex shrink-0 items-center gap-2 border-t border-line bg-ink p-4 sm:px-6">
             {!isNew && (
-              <Press type="button" variant="ghost" className={cn("h-11 px-4 text-sm", confirmDel ? "bg-rose-500/15 text-rose-300" : "text-zinc-400")} onClick={remove}>
+              <Press type="button" variant="ghost" className={cn("h-11 px-4 text-sm", confirmDel ? "bg-brasa/15 text-[#ff8f82]" : "text-zinc-400")} onClick={remove}>
                 <Trash2 className="h-4 w-4" /> {confirmDel ? "Confirmar exclusão" : "Excluir"}
               </Press>
             )}
@@ -370,7 +386,7 @@ function ArtOptions({ art, setArt }: { art: DishArtSpec; setArt: (p: Partial<Dis
             <button key={c} type="button" aria-label={`Cor ${c}`} onClick={() => setArt({ color: c })} className={cn("h-7 w-7 rounded-full ring-2 ring-offset-2 ring-offset-surface", art.color === c ? "ring-amber-300" : "ring-transparent")} style={{ background: c }} />
           ))}
         </div>
-        <input value={art.label} maxLength={9} onChange={(e) => setArt({ label: e.target.value.toUpperCase() })} className="w-full rounded-control bg-white/[0.04] px-3 py-2 text-sm text-white ring-1 ring-white/10 focus:outline-none focus:ring-amber-400/40" placeholder="Texto do rótulo" />
+        <input value={art.label} maxLength={9} onChange={(e) => setArt({ label: e.target.value.toUpperCase() })} className="w-full rounded-control border border-line bg-ink px-3 py-2 text-sm text-white focus:border-amber-400/60 focus:outline-none" placeholder="Texto do rótulo" />
       </div>
     );
   }
@@ -410,19 +426,19 @@ function Toggle({ title, sub, checked, onChange }: { title: string; sub: string;
 }
 
 const Chip = ({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) => (
-  <button type="button" onClick={onClick} className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium ring-1 transition", on ? "bg-amber-400/15 text-amber-200 ring-amber-400/50" : "bg-white/[0.04] text-zinc-400 ring-white/10 hover:text-zinc-200")}>
+  <button type="button" onClick={onClick} className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-colors", on ? "border-amber-400/60 bg-amber-400/15 text-amber-200" : "border-line text-zinc-400 hover:text-zinc-200")}>
     {children}
   </button>
 );
 
-const Label = ({ children }: { children: React.ReactNode }) => <p className="text-2xs font-bold uppercase tracking-widest text-zinc-400">{children}</p>;
+const Label = ({ children }: { children: React.ReactNode }) => <p className="text-small font-semibold text-zinc-200">{children}</p>;
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
       {children}
-      {error && <p className="px-1 text-xs font-medium text-rose-400">{error}</p>}
+      {error && <p className="px-1 text-xs font-medium text-brasa">{error}</p>}
     </div>
   );
 }

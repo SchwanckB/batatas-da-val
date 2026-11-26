@@ -1,107 +1,76 @@
-# Prompt de melhorias — cole no Claude Code (VS Code)
+# O que já foi feito e o que ainda dá para fazer
 
-> Como usar: abra a pasta do projeto no VS Code, abra o painel do **Claude Code** e cole **um bloco por vez**
-> (comece pelo "Prompt inicial" e depois uma fase de cada vez). Revise e teste antes de seguir para a próxima.
-
----
-
-## Prompt inicial (cole primeiro)
-
-```
-Leia CLAUDE.md e docs/HANDOFF.md. Este é o sistema de delivery da Batatas da Val
-(Next.js 15 + Tailwind v4 + Framer Motion + Supabase, deploy na Vercel).
-
-Objetivo: transformar o protótipo em um SaaS de delivery profissional, mantendo o
-design system atual (Liquid Glass, botões dourados, sem emojis, tudo em pt-BR).
-
-Antes de codar:
-1. Rode npm install, npx tsc --noEmit, npm run lint e npm run build e me diga o estado.
-2. Resuma a arquitetura em 10 linhas para eu confirmar que você entendeu.
-3. NÃO comece nenhuma fase sem eu pedir. Vamos fase por fase do docs/PROMPT-MELHORIAS.md.
-
-Regras para todas as fases:
-- Planeje antes (lista de arquivos e passos), espere meu OK, depois implemente.
-- Siga os tokens e componentes do design system (Press, Sheet, Switch, Spotlight, Skeleton).
-- Mobile-first. Teste em 390px e 1440px.
-- Ao terminar: tsc + lint + build sem erros e um resumo do que testar manualmente.
-- Faça um commit por fase com mensagem clara em português.
-```
+> As fases 1 a 5 do roteiro antigo (Supabase) foram executadas — com Redis da Vercel no lugar do
+> Supabase, a pedido. O que sobrou está em "Próximos passos". Para pedir uma melhoria ao Claude
+> Code, cole um bloco por vez e revise antes de seguir.
 
 ---
 
-## Fase 1 — Dados reais no Supabase (base de tudo)
+## Já entregue
 
+| Tema | Onde ver |
+| --- | --- |
+| Dados no servidor (Redis), um estado por loja, com trava e revisão | `src/lib/server/` |
+| Preço, frete, cupom e horário recalculados no servidor | `src/lib/pricing.ts` |
+| Login próprio com papéis (dono, cozinha, caixa) e histórico | `src/lib/server/auth.ts`, módulo Equipe |
+| Configurações da loja: horários, pausa, avisos, Pix, pedido mínimo | módulo Loja |
+| Bairros, fretes, tempos e adicionais editáveis | módulo Entrega |
+| Cupons de desconto | módulo Cupons |
+| Bipe + notificação de pedido novo, comanda 80 mm, cancelamento | módulo Pedidos |
+| Turno de caixa com conferência e CSV | módulo Caixa |
+| Relatórios com gráficos e CSV | módulo Relatórios |
+| Meus pedidos, pedir de novo, Pix com QR, avaliação, `/pedido/[token]` | cliente |
+| PWA, SEO local com JSON-LD, sitemap, robots | `src/app/` |
+| Redesign tirando a "cara de IA" | `globals.css` + `src/components/` |
+
+---
+
+## Próximos passos
+
+### 1. Fotos de verdade
 ```
-Fase 1: migrar o estado de localStorage para o Supabase.
+Hoje os produtos usam ilustração vetorial (DishArt). Isso resolve, mas três batatões
+diferentes ficam parecidos demais na tela. Quero trocar por fotos.
 
-1. Crie supabase/migrations/<data>_inicial.sql com tabelas:
-   sections, products, extras, neighborhoods (bairro, taxa, tempo), ingredients (estoque),
-   orders, order_items, order_status_history, cash_entries, store_settings
-   (nome, telefone, whatsapp, instagram, cidade, horários por dia, loja_pausada, pedido_minimo).
-   Use uuid, created_at/updated_at, valores em centavos (integer).
-2. RLS em todas: leitura pública apenas de sections ativas, products disponíveis,
-   extras, neighborhoods e store_settings. Cliente anônimo pode INSERIR orders/order_items
-   (via função RPC create_order que recalcula preços no servidor — nunca confiar no preço do navegador).
-   Todo o resto só para usuários autenticados (admin).
-3. Seed com os dados de src/lib/data.ts.
-4. Reescreva src/lib/store.tsx mantendo a MESMA interface pública (useStore), trocando a
-   persistência por Supabase. Use Supabase Realtime em orders para o painel e para o
-   acompanhamento do cliente atualizarem ao vivo. Carrinho continua no localStorage.
-5. Baixa de estoque e mudança de status via RPC (transação) para não haver corrida.
-6. Fotos de produto no Supabase Storage (bucket "produtos", público para leitura).
-7. Página /pedido/[id] para o cliente acompanhar pelo link (use um token público do pedido, não o id sequencial).
-Me mostre o SQL antes de aplicar.
-```
-
-## Fase 2 — Operação da loja
-
-```
-Fase 2: operação.
-1. Configurações da loja no admin (novo módulo "Loja"): dados de contato, horários por dia da
-   semana, botão "Pausar pedidos", pedido mínimo, tempo médio de preparo.
-2. Badge Aberto/Fechado calculado pelo horário real (fuso America/Sao_Paulo). Fora do horário:
-   cardápio visível, checkout bloqueado com mensagem "Abrimos qua a dom a partir das 19:30".
-3. Bairros e taxas editáveis no admin. Adicionais editáveis (nome, preço, ingrediente do estoque).
-4. Cupons de desconto (valor fixo ou %, validade, uso máximo, pedido mínimo) aplicados no checkout
-   e validados no servidor.
-5. Alerta sonoro + notificação do navegador quando chega pedido novo no admin.
-6. Imprimir comanda (layout 80mm térmica) a partir do card do pedido.
-7. Cancelar pedido com motivo; estorna estoque se já tinha baixado.
+1. Suba as fotos pelo painel (Cardápio → produto → Enviar foto) e confira como a lista
+   do cardápio e o carrossel ficam com imagem real.
+2. Se as fotos forem pesadas, troque o data URL por um bucket externo (Vercel Blob) e
+   guarde só a URL no estado. Mantenha a compressão de `src/lib/image.ts`.
+3. Ajuste o enquadramento: a vitrine é quadrada na lista e 16:9 no destaque.
 ```
 
-## Fase 3 — Experiência do cliente
-
+### 2. Testes automatizados que ficam no repositório
 ```
-Fase 3: cliente.
-1. Identificação leve pelo telefone (salvar nome/endereço no aparelho; opcional OTP por SMS depois).
-2. "Meus pedidos" com histórico e botão "Pedir de novo".
-3. Pix com QR Code e "copia e cola" gerados a partir da chave da loja (BR Code estático com valor).
-4. PWA: manifest, ícones a partir de public/logo.png, instalar na tela inicial, offline do cardápio.
-5. SEO local: metadata, Open Graph com a logo, JSON-LD Restaurant (endereço, horário, telefone), sitemap.
-6. Avaliação do pedido (1–5 estrelas + comentário) após "Entregue", visível no admin.
-```
-
-## Fase 4 — Gestão e relatórios
-
-```
-Fase 4: gestão.
-1. Relatórios no admin: vendas por dia/semana/mês, produtos mais vendidos, ticket médio,
-   horários de pico, formas de pagamento, bairros. Gráficos leves e acessíveis.
-2. Abertura e fechamento de caixa por turno (fundo de troco, conferência, diferença).
-3. Usuários e papéis: dono (tudo), cozinha (só pedidos), caixa (pedidos + caixa). Convite por e-mail.
-4. Histórico de alterações (quem mudou preço/estoque e quando).
-5. Exportar relatórios em CSV.
+Crie testes end-to-end com Playwright em tests/, rodando contra o build de produção com
+BDV_ALLOW_FILE_STORAGE=1:
+- pedido completo do cliente até a confirmação;
+- login do painel, avanço de status e baixa de estoque;
+- loja fechada bloqueia o checkout;
+- cupom inválido é recusado pelo servidor.
+Adicione o script "test:e2e" no package.json e documente como rodar.
 ```
 
-## Fase 5 — Qualidade e lançamento
-
+### 3. Avisar o cliente sem ele estar com o site aberto
 ```
-Fase 5: qualidade.
-1. Testes E2E com Playwright: pedido completo, login admin, criar produto, ocultar seção.
-2. Vercel Analytics + Speed Insights. Monitorar erros.
-3. Revisão de acessibilidade (contraste, foco, leitores de tela, alvos de toque).
-4. Revisão de segurança: RLS, rate limit no create_order, validação de entrada com zod.
-5. Checklist de lançamento: domínio próprio, e-mails do Supabase em pt-BR, política de privacidade (LGPD).
+Hoje o acompanhamento só atualiza com a página aberta. Avalie:
+- Web Push no PWA (precisa de chave VAPID e de um worker para a assinatura), ou
+- uma mensagem automática no WhatsApp quando o pedido sai para entrega.
+Compare esforço e custo antes de implementar e me mostre a recomendação.
+```
+
+### 4. Impressão automática
+```
+A comanda hoje abre o diálogo de impressão do navegador. Se a loja tiver impressora térmica
+de rede, implemente impressão direta (ESC/POS via ponte local) com opção de ligar/desligar
+no módulo Loja.
+```
+
+### 5. Medir e cuidar
+```
+1. Vercel Analytics e Speed Insights.
+2. Revisão de acessibilidade com leitor de tela no fluxo de pedido.
+3. Checklist de lançamento: domínio próprio, política de privacidade (LGPD) e um backup
+   periódico do estado do Redis (exportar o JSON para o Blob uma vez por dia).
 ```
 
 ---
@@ -109,14 +78,19 @@ Fase 5: qualidade.
 ## Prompts rápidos úteis
 
 ```
-Revise visualmente a tela X no celular (390px) e no desktop e liste melhorias de hierarquia,
-espaçamento e contraste seguindo o design system do CLAUDE.md. Depois aplique.
+Revise a tela X no celular (390px) e no desktop e liste melhorias de hierarquia, espaçamento
+e contraste seguindo o design system do CLAUDE.md. Depois aplique.
 ```
 
 ```
-Adicione o produto "<nome>" na seção "<seção>" com preço R$ <valor> pelo seed do Supabase.
+Adicione o produto "<nome>" na seção "<seção>" por R$ <valor> direto no seed de src/lib/data.ts
+(ou me diga como cadastrar pelo painel, se for mais rápido).
 ```
 
 ```
 Encontre e corrija qualquer cor, raio ou tamanho de fonte fora dos tokens do design system.
+```
+
+```
+Rode npx tsc --noEmit, npm run lint e npm run build e me diga o estado do projeto.
 ```

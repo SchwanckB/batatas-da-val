@@ -1,60 +1,94 @@
 # Handoff — Batatas da Val
 
-_Estado do projeto em 26/11/2026._
+_Estado do projeto em 25/11/2026._
 
-## 1. O que está pronto
+## 1. O que mudou nesta rodada
+
+**Saiu o Supabase, entrou o Redis da Vercel.** O estado da loja agora vive no servidor, e não
+mais no navegador: o pedido feito no celular do cliente cai no painel do notebook na hora.
+
+**O visual foi refeito.** O dark glassmorphism com bolhas animadas, texto em gradiente e grade
+de cards idênticos dava cara de template. No lugar: preto quente de chapa, faixa creme de papel
+para o cardápio, letreiro condensado (Anton) e o cardápio em lista com linha pontilhada até o
+preço — como um cardápio impresso. As animações continuam todas.
+
+## 2. O que está pronto
 
 ### Cliente (`/`)
-- Cardápio com seções dinâmicas (só aparecem as **marcadas no painel** e que têm produtos).
-- Busca por nome/ingrediente, carrossel "Mais Pedidos da Noite", produtos esgotados exibidos como **Esgotado**.
-- Modal de personalização: tamanho Média/Gigante, 5 adicionais, observações, quantidade.
-- Carrinho em gaveta, frete por bairro (Centro R$5, Próximos R$7, Interior R$10, Retirada grátis).
-- Checkout: nome, telefone (máscara), endereço, Pix / Cartão na entrega / Dinheiro com troco.
-- Confirmação com acompanhamento em tempo real e resumo pelo WhatsApp (51) 9687-0865.
-- Animações: item voando ao carrinho, toasts estilo Dynamic Island, skeletons, spotlight nos cards.
+- Cardápio com seções dinâmicas, busca por nome ou ingrediente, carrossel dos mais pedidos.
+- Faixa de **avisos escritos no painel** ("alta demanda hoje…") no topo do cardápio.
+- Selo **Aberto/Fechado calculado pelo horário real** (fuso de São Paulo, vira a meia-noite).
+  Fora do horário o cardápio continua visível e o checkout fica bloqueado com a explicação.
+- Modal do produto: tamanho Média/Gigante, adicionais, observação, quantidade.
+- Sacola, frete por área de entrega, **cupom de desconto** validado no servidor, pedido mínimo.
+- Checkout com Pix, cartão na entrega ou dinheiro com troco.
+- Confirmação com acompanhamento ao vivo, **QR Code do Pix** com valor preenchido, resumo no
+  WhatsApp e link permanente do pedido.
+- **Meus pedidos**: histórico do aparelho, acompanhar de novo e "pedir de novo".
+- **Avaliação** de 1 a 5 estrelas depois que o pedido é entregue.
+- PWA: dá para instalar na tela inicial e o cardápio abre sem internet.
+- SEO local: metadados, Open Graph, JSON-LD de Restaurant com horários, sitemap e robots.
 
-### Admin (`/admin`, protegido por login Supabase)
-- **Pedidos**: Kanban Novos → Em preparo → Em entrega → Concluídos; observações em destaque; baixa automática de estoque.
-- **Cardápio**: seções (criar, renomear, ícone, reordenar, **mostrar/ocultar para clientes**, excluir se vazia) e
-  produtos (criar/editar/excluir, foto ou ilustração, preço, tamanho Gigante, selos, destaque, disponível/esgotado,
-  adicionais, ficha técnica para baixa de estoque).
-- **Caixa**: faturamento, pedidos, ticket médio, saldo da gaveta, por forma de pagamento, reforço/sangria.
-- **Estoque**: 9 insumos com níveis OK/Atenção/Crítico e reposição rápida.
-- Seções já cadastradas e **ocultas**: Torres de Batata, Xis, Hambúrgueres (com produtos de exemplo).
-
-## 2. Limitação principal (resolver primeiro)
-Pedidos, cardápio, caixa e estoque estão em **localStorage** (`src/lib/store.tsx`). Isso sincroniza abas do
-mesmo navegador, mas **não entre aparelhos**: um produto criado no notebook não aparece no celular do cliente,
-e o pedido do cliente não chega ao painel. A Fase 1 do `PROMPT-MELHORIAS.md` migra tudo para o Supabase.
-
-Fotos enviadas hoje viram data URL (comprimidas a 720px) no localStorage — migrar para Supabase Storage.
+### Painel (`/admin`, login próprio)
+- **Pedidos**: Kanban Novos → Em preparo → Em entrega → Concluídos, com observações em destaque,
+  baixa automática de estoque, **bipe e notificação** quando chega pedido novo,
+  **impressão de comanda 80 mm** e **cancelamento com motivo** (devolve insumo e libera o cupom).
+- **Cardápio**: seções (criar, renomear, ícone, reordenar, mostrar/ocultar) e produtos
+  (foto ou ilustração, preços, selos, destaque, disponível/esgotado, ficha técnica).
+- **Caixa**: abertura de turno com fundo de troco, faturamento, formas de pagamento, reforço e
+  sangria, **fechamento com conferência e diferença**, exportação em CSV.
+- **Estoque**: insumos com níveis, reposição rápida e cadastro de novos insumos.
+- **Entrega**: áreas, **fretes e tempos editáveis**, retirada no local, e os **adicionais**
+  (nome, preço e qual insumo baixa).
+- **Cupons**: valor fixo ou porcentagem, validade, limite de usos, pedido mínimo.
+- **Relatórios**: vendas por dia, horários de pico, mais vendidos, formas de pagamento, por
+  área, avaliações, e CSV de tudo.
+- **Loja**: horários por dia, pausar pedidos com recado, avisos da tela inicial, pedido mínimo,
+  tempo de preparo, contato e chave Pix.
+- **Equipe**: acessos com papel (dono, cozinha, caixa) e **histórico de alterações**.
 
 ## 3. Como rodar
 ```bash
 npm install
-cp .env.example .env.local   # preencha as chaves do Supabase
+cp .env.example .env.local    # preencha AUTH_SECRET e ADMIN_PASSWORD
 npm run dev
 ```
-Sem as chaves o site do cliente funciona, mas o `/admin` fica fechado (falha segura).
+Sem Redis configurado, o modo de desenvolvimento guarda tudo em `.data/kv.json`. Para testar o
+build de produção na própria máquina: `BDV_ALLOW_FILE_STORAGE=1 npm start`.
 
-## 4. Configurar Supabase
-1. Crie o projeto (via integração da Vercel ou em supabase.com).
-2. Copie **Project URL** e **anon/publishable key** para `.env.local` e para as variáveis da Vercel.
-3. Authentication → Users → **Add user** (marque Auto Confirm) com o e-mail/senha do dono.
-4. Authentication → Sign In / Providers → Email → **desligue "Allow new users to sign up"**.
+Primeiro login: usuário `ADMIN_LOGIN` (padrão `dono`) com a senha de `ADMIN_PASSWORD`. Em
+desenvolvimento, sem essas variáveis, vale `dono` / `batatas`. Depois do primeiro acesso,
+gerencie as pessoas no módulo **Equipe** e troque a senha por lá.
 
-## 5. Deploy na Vercel
-GitHub → vercel.com → Add New Project → importar → conectar Supabase → Deploy.
-Nenhuma configuração extra (Next.js detectado automaticamente). Após mudar variáveis: **Redeploy**.
+## 4. Configurar na Vercel
+1. Importe o repositório. Next.js é detectado sozinho.
+2. **Storage → Redis** → criar e conectar ao projeto. Isso cria a `REDIS_URL`.
+3. Em Settings → Environment Variables, adicione:
+   - `AUTH_SECRET` — gere com `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+   - `ADMIN_PASSWORD` — senha do primeiro acesso
+   - `NEXT_PUBLIC_SITE_URL` — o domínio final
+4. Redeploy. Entre em `/admin/login` e crie o resto da equipe.
 
-## 6. Mapa de arquivos importante
-Ver tabela em `CLAUDE.md`. Pontos de extensão:
-- Novo tipo de ilustração: `DishArtSpec` em `types.ts` + componente em `DishArt.tsx` + preset em `ProductEditor.tsx`.
-- Novo módulo do admin: `MODULES` em `AdminApp.tsx`.
-- Regras de preço/estoque: `unitPriceFor` e `orderConsumption` em `data.ts`.
+Se faltar `AUTH_SECRET` ou Redis, o painel avisa na tela de login em vez de falhar escondido.
 
-## 7. Verificação realizada
-- `tsc`, `eslint` e `next build` sem erros.
-- Teste automatizado (Playwright): pedido do cliente → admin → status ao vivo → baixa de estoque correta;
-  login com senha errada/correta, ativar seção "Xis", criar produto, aparecer no cliente, ocultar seção, sair.
-- Login testado contra um servidor que **imita** o Supabase Auth — falta testar com o projeto real.
+## 5. Segurança
+- Sessão em cookie `httpOnly` assinado com HMAC-SHA256; senha com PBKDF2 (120 mil iterações).
+- Preço, frete, desconto e horário são recalculados no servidor a cada pedido.
+- Limites por IP: 8 pedidos a cada 15 min, 10 tentativas de login a cada 5 min, 20 tentativas de
+  cupom a cada 2 min.
+- Toda entrada da API passa por zod.
+- O cliente nunca recebe a chave Pix nem a lista de usuários (`publicState` filtra).
+- O acompanhamento público usa um token aleatório, nunca o número do pedido.
+
+## 6. Verificação feita
+- `npx tsc --noEmit`, `npm run lint` e `npm run build` sem erro.
+- Teste automatizado (Playwright) contra o **build de produção**: cliente adiciona item, fecha o
+  pedido, o painel recebe, o dono entra com login próprio, avança o status e o cliente vê a
+  mudança ao vivo. Telas conferidas em 390 px e 1440 px.
+- Falta testar com um Redis de verdade na Vercel: o teste local usou o modo arquivo.
+
+## 7. Pontos de extensão
+- Nova ilustração: `DishArtSpec` em `types.ts` + componente em `DishArt.tsx` + preset em `ProductEditor.tsx`.
+- Novo módulo do painel: `MODULES` em `AdminApp.tsx` (com os papéis que podem ver).
+- Nova ação: `Action` em `actions.ts` → `applyAction` → schema em `server/schemas.ts`.
+- Regras de preço e estoque: `quoteOrder` em `pricing.ts` e `orderConsumption` em `data.ts`.

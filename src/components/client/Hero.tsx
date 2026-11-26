@@ -1,17 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, MapPin, Phone, Search, X } from "lucide-react";
-import { InstagramIcon } from "@/components/ui/InstagramIcon";
+import { MapPin } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
-import { STORE } from "@/lib/format";
-
-const INFO = [
-  { Icon: MapPin, label: "Atendemos", value: STORE.city },
-  { Icon: Clock, label: "Horário", value: STORE.hours },
-  { Icon: Phone, label: "WhatsApp", value: STORE.phone, href: `https://wa.me/${STORE.whatsapp}` },
-  { Icon: InstagramIcon, label: "Instagram", value: STORE.instagram, href: STORE.instagramUrl },
-];
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
+import { findNeighborhood } from "@/lib/data";
+import { money, waLink } from "@/lib/format";
+import { hoursSummary, type StoreSchedule } from "@/lib/hours";
+import type { Neighborhood, StoreSettings } from "@/lib/types";
 
 const fadeUp = (d: number) => ({
   initial: { opacity: 0, y: 16 },
@@ -19,75 +15,104 @@ const fadeUp = (d: number) => ({
   transition: { type: "spring" as const, stiffness: 260, damping: 26, delay: d },
 });
 
-export function Hero({ query, onQuery }: { query: string; onQuery: (q: string) => void }) {
+/** Fatos de verdade sobre entrega, retirada e pagamento — não "features". */
+function deliveryFacts(settings: StoreSchedule, neighborhoods: Neighborhood[]) {
+  const entrega = neighborhoods.filter((n) => !n.pickup);
+  const retirada = findNeighborhood(neighborhoods, "retirada") ?? neighborhoods.find((n) => n.pickup);
+  const cheapest = entrega.reduce<Neighborhood | null>((a, n) => (!a || n.fee < a.fee ? n : a), null);
+  const dearest = entrega.reduce<Neighborhood | null>((a, n) => (!a || n.fee > a.fee ? n : a), null);
+
+  return [
+    {
+      label: "Entrega",
+      value:
+        cheapest && dearest
+          ? cheapest.fee === dearest.fee
+            ? `${money(cheapest.fee)} em toda a cidade`
+            : `${cheapest.name} ${money(cheapest.fee)}, ${dearest.name.toLowerCase()} ${money(dearest.fee)}`
+          : "combine pelo WhatsApp",
+    },
+    {
+      label: "Retirada",
+      value: retirada ? `sem taxa, pronto em ${retirada.etaMin}–${retirada.etaMax} min` : "fale com a gente",
+    },
+    { label: "Atendimento", value: hoursSummary(settings) },
+    { label: "Pagamento", value: "Pix, cartão na entrega ou dinheiro" },
+  ];
+}
+
+export function Hero({
+  settings,
+  neighborhoods,
+  onSeeMenu,
+}: {
+  settings: Omit<StoreSettings, "pixKey" | "pixName" | "pixCity">;
+  neighborhoods: Neighborhood[];
+  onSeeMenu: () => void;
+}) {
+  const facts = deliveryFacts(settings, neighborhoods);
+
   return (
-    <section className="relative mx-auto mt-6 max-w-6xl px-4 sm:mt-10 sm:px-6">
-      <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+    <section className="mx-auto mt-8 max-w-6xl px-4 sm:mt-12 sm:px-6">
+      <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-12">
         <div className="max-w-xl">
-          <motion.p {...fadeUp(0.05)} className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-400/10 px-3 py-1 text-xs font-semibold text-amber-300 ring-1 ring-inset ring-amber-400/25">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" /> Batatões recheados • Delivery
+          <motion.p {...fadeUp(0.04)} className="flex items-center gap-1.5 text-small text-zinc-400">
+            <MapPin className="h-3.5 w-3.5 text-amber-400" aria-hidden />
+            {settings.city}
           </motion.p>
-          <motion.h1 {...fadeUp(0.1)} className="text-4xl font-extrabold leading-[1.04] tracking-[-0.03em] text-white sm:text-6xl">
-            Crocante por fora,{" "}
-            <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-orange-500 bg-clip-text text-transparent">
-              cremosa por dentro!
-            </span>
+
+          <motion.h1 {...fadeUp(0.09)} className="letreiro mt-3 text-white">
+            <span className="block text-[clamp(2.75rem,12vw,5.25rem)]">Batatão recheado</span>
+            <span className="block text-[clamp(1.5rem,6vw,2.75rem)] text-amber-400">feito na hora</span>
           </motion.h1>
-          <motion.p {...fadeUp(0.14)} className="mt-3 max-w-md text-base leading-relaxed text-zinc-400">
-            Batatões recheados feitos na hora, com ingredientes generosos e entrega quentinha em Três Cachoeiras.
+
+          <motion.p {...fadeUp(0.13)} className="mt-5 max-w-prose text-base leading-relaxed text-zinc-300">
+            A batata entra na fritura quando o pedido chega. Sai sequinha e desaparece embaixo do strogonoff,
+            do frango com Catupiry ou do cheddar com bacon. Média de 500&nbsp;g para um, gigante de 800&nbsp;g
+            para dividir.
           </motion.p>
+
+          <motion.div {...fadeUp(0.17)} className="mt-6 flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={onSeeMenu}
+              className="btn-gold inline-flex h-12 items-center rounded-control px-6 text-base font-bold"
+            >
+              Ver o cardápio
+            </button>
+            <a
+              href={waLink(settings.whatsapp, "Oi! Vi o cardápio no site e queria tirar uma dúvida.")}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-12 items-center gap-2 rounded-control border border-line px-5 text-base font-semibold text-zinc-200 transition-colors hover:border-amber-400/50 hover:text-white"
+            >
+              <WhatsAppIcon className="h-5 w-5" aria-hidden /> Falar no WhatsApp
+            </a>
+          </motion.div>
         </div>
+
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
+          initial={{ opacity: 0, scale: 0.82, rotate: -6 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.15 }}
-          className="relative hidden md:block"
+          transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.14 }}
+          className="relative hidden shrink-0 md:block"
         >
-          <div className="absolute inset-0 -z-10 scale-125 rounded-full bg-amber-500/25 blur-3xl" />
-          <Logo size={190} className="ring-2" />
+          <div className="rounded-full border border-amber-400/25 p-3">
+            <Logo size={176} />
+          </div>
         </motion.div>
       </div>
 
-      <motion.div {...fadeUp(0.18)} className="glass mt-6 grid grid-cols-2 gap-1 rounded-panel p-1.5 sm:flex sm:items-stretch">
-        {INFO.map(({ Icon, label, value, href }, i) => {
-          const body = (
-            <>
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-control bg-amber-400/10 text-amber-300 ring-1 ring-inset ring-amber-400/20">
-                <Icon className="h-4 w-4" />
-              </span>
-              <span className="min-w-0 leading-tight">
-                <span className="block text-2xs font-medium uppercase tracking-wider text-zinc-400">{label}</span>
-                <span className="block text-small font-semibold text-zinc-100 sm:whitespace-nowrap">{value}</span>
-              </span>
-            </>
-          );
-          const cls = `flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3 rounded-control px-3 py-2 transition-colors ${i ? "sm:border-l sm:border-white/[0.06]" : ""}`;
-          return href ? (
-            <a key={label} href={href} target="_blank" rel="noreferrer" className={`${cls} hover:bg-white/[0.05]`}>
-              {body}
-            </a>
-          ) : (
-            <div key={label} className={cls}>
-              {body}
-            </div>
-          );
-        })}
-      </motion.div>
-
-      <motion.label {...fadeUp(0.22)} className="glass mt-3 flex items-center gap-3 rounded-panel px-5 py-4 focus-within:ring-2 focus-within:ring-amber-400/40">
-        <Search className="h-5 w-5 shrink-0 text-zinc-400" />
-        <input
-          value={query}
-          onChange={(e) => onQuery(e.target.value)}
-          placeholder="Buscar por nome ou ingrediente (bacon, frango, cheddar...)"
-          className="min-w-0 flex-1 bg-transparent text-white placeholder:text-zinc-400 focus:outline-none"
-        />
-        {query && (
-          <button onClick={() => onQuery("")} aria-label="Limpar busca" className="grid h-7 w-7 place-items-center rounded-full bg-white/10 text-zinc-300">
-            <X className="h-3.5 w-3.5" />
-          </button>
-        )}
-      </motion.label>
+      <motion.dl
+        {...fadeUp(0.21)}
+        className="mt-10 grid gap-x-10 border-t border-line pt-1 sm:grid-cols-2"
+      >
+        {facts.map((f) => (
+          <div key={f.label} className="flex items-baseline gap-3 border-b border-line py-2.5">
+            <dt className="w-24 shrink-0 text-small text-zinc-400">{f.label}</dt>
+            <dd className="text-small font-semibold text-zinc-100">{f.value}</dd>
+          </div>
+        ))}
+      </motion.dl>
     </section>
   );
 }

@@ -1,33 +1,65 @@
 @import "tailwindcss";
 
 /* ============================================================
-   DESIGN TOKENS — Liquid Glass Gourmet
+   DESIGN TOKENS — "Cardápio de esquina"
+   Preto quente de chapa, dourado da marca, creme de papel.
+   Nada de vidro translúcido, gradiente em texto ou bolha animada:
+   a cara é de cardápio impresso, não de landing page genérica.
    ============================================================ */
-@theme inline {
-  /* Tipografia */
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+@theme {
+  /* Tipografia: display condensada (letreiro) + corpo com personalidade */
+  --font-display: var(--font-anton), "Arial Narrow", Impact, sans-serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --text-2xs: 0.6875rem; /* 11px — metadados, legendas */
   --text-2xs--line-height: 1rem;
   --text-small: 0.8125rem; /* 13px — corpo secundário */
   --text-small--line-height: 1.25rem;
 
-  /* Superfícies */
-  --color-ink: #0a0a0c;
-  --color-ink-2: #111114;
-  --color-surface: #16161a;
+  /* Superfícies — preto quente, não cinza azulado */
+  --color-ink: #120f0c;
+  --color-ink-2: #1a1611;
+  --color-surface: #211c16;
+  --color-surface-2: #2b241c;
+  --color-line: #3a3026;
+
+  /* Papel: faixa clara do cardápio */
+  --color-paper: #f7f0e3;
+  --color-paper-2: #ece2cf;
+  --color-paper-ink: #1a1611;
 
   /* Marca */
-  --color-gold: #f59e0b;
-  --color-gold-2: #fbbf24;
-  --color-cta: #fbbf24;
-  --color-cta-2: #f59e0b;
-  --color-on-brand: #2a1405; /* texto sobre dourado */
-  --color-on-success: #06281b; /* texto sobre verde */
+  --color-gold: #f5a524;
+  --color-gold-soft: #ffc247;
+  --color-gold-deep: #a8650a;
+  --color-on-brand: #2a1705; /* texto sobre dourado */
+  --color-on-success: #05251a;
+  --color-brasa: #d33a2c; /* só erro, alerta e estado crítico */
+  --color-aberto: #41b263;
 
-  /* Raios */
-  --radius-control: 0.875rem; /* 14px — inputs, botões */
-  --radius-card: 1.375rem; /* 22px — cards */
-  --radius-panel: 1.75rem; /* 28px — painéis, header, modais */
+  /* Raios: menores e mais "impressos" */
+  --radius-control: 0.625rem; /* 10px — inputs, botões */
+  --radius-card: 0.875rem; /* 14px — cards */
+  --radius-panel: 1.25rem; /* 20px — painéis, header, modais */
+
+  /* Dourados do Tailwind apontando para a marca (unifica todo `amber-*`) */
+  --color-amber-200: #ffdb92;
+  --color-amber-300: #ffc247;
+  --color-amber-400: #f5a524;
+  --color-amber-500: #e08a0b;
+  --color-amber-600: #c2740a;
+  --color-amber-700: #a8650a;
+
+  /* Cinzas quentes no lugar dos cinzas frios */
+  --color-white: #fff8ee;
+  --color-zinc-100: #f7f1e8;
+  --color-zinc-200: #e4dbcf;
+  --color-zinc-300: #cdc2b4;
+  --color-zinc-400: #a99c8c;
+  --color-zinc-500: #8a7d6e;
+  --color-zinc-600: #6b5f52;
+  --color-zinc-700: #4a4036;
+  --color-zinc-800: #322b23;
+  --color-zinc-900: #211c16;
 }
 
 :root {
@@ -36,8 +68,8 @@
 
 html,
 body {
-  background: #0a0a0c;
-  color: #f4f4f5;
+  background: var(--color-ink);
+  color: var(--color-zinc-100);
 }
 
 body {
@@ -48,95 +80,138 @@ body {
 }
 
 ::selection {
-  background: rgb(245 158 11 / 0.35);
+  background: rgb(245 165 36 / 0.3);
 }
 
-/* Superfície Liquid Glass */
-.glass {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.075), rgb(255 255 255 / 0.035));
-  border: 1px solid rgb(255 255 255 / 0.12);
-  box-shadow:
-    inset 0 1px 1px rgb(255 255 255 / 0.18),
-    inset 0 -1px 1px rgb(0 0 0 / 0.25),
-    0 12px 40px -12px rgb(0 0 0 / 0.6);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
-}
-.glass-strong {
-  background: linear-gradient(180deg, rgb(28 28 34 / 0.9), rgb(18 18 22 / 0.86));
-  border: 1px solid rgb(255 255 255 / 0.13);
-  box-shadow:
-    inset 0 1px 1px rgb(255 255 255 / 0.16),
-    0 24px 80px -20px rgb(0 0 0 / 0.8);
-  backdrop-filter: blur(40px) saturate(170%);
-  -webkit-backdrop-filter: blur(40px) saturate(170%);
+/* Números sempre alinhados (preço, total, troco) */
+.tnum {
+  font-variant-numeric: tabular-nums;
 }
 
-/* Spotlight que segue o cursor */
+/* Letreiro: display condensada em caixa alta */
+.letreiro {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+  font-weight: 400;
+}
+
+/* ============================================================
+   SUPERFÍCIES
+   Sólidas e quentes. O vidro translúcido saiu: ele era o maior
+   responsável pelo ar de template.
+   ============================================================ */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  box-shadow:
+    inset 0 1px 0 rgb(255 248 238 / 0.06),
+    0 2px 0 rgb(0 0 0 / 0.25);
+}
+
+.panel-strong {
+  background: var(--color-ink-2);
+  border: 1px solid var(--color-line);
+  box-shadow:
+    inset 0 1px 0 rgb(255 248 238 / 0.07),
+    0 14px 40px -18px rgb(0 0 0 / 0.9);
+}
+
+/* Header e gavetas continuam com um leve blur: ali ele serve para leitura */
+.sticky-blur {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: color-mix(in oklab, var(--color-ink-2) 88%, transparent);
+}
+
+/* Faixa clara: usada na área do cardápio para lembrar papel */
+.papel {
+  background: var(--color-paper);
+  color: var(--color-paper-ink);
+}
+
+/* Linha pontilhada do cardápio impresso (nome ....... preço) */
+.guia {
+  flex: 1;
+  height: 0;
+  margin: 0 0.5rem;
+  border-bottom: 1px dotted var(--color-line);
+  transform: translateY(-0.25rem);
+}
+.papel .guia {
+  border-bottom-color: rgb(26 22 17 / 0.28);
+}
+
+/* Realce de hover discreto e quente (substitui o antigo "spotlight" de IA) */
 .spotlight {
   position: relative;
   isolation: isolate;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
-.spotlight::before,
-.spotlight::after {
+.spotlight::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.25s ease;
+  background: linear-gradient(180deg, rgb(245 165 36 / 0.07), transparent 55%);
 }
-.spotlight::before {
-  z-index: 0;
-  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(251 191 36 / 0.12), transparent 45%);
+.spotlight:hover {
+  border-color: color-mix(in oklab, var(--color-gold) 45%, var(--color-line));
+  box-shadow: 0 10px 24px -16px rgb(0 0 0 / 0.9);
 }
-.spotlight::after {
-  z-index: 2;
-  padding: 1px;
-  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgb(251 191 36 / 0.65), transparent 60%);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-.spotlight:hover::before,
-.spotlight:hover::after {
+.spotlight:hover::before {
   opacity: 1;
 }
 
-/* Skeleton shimmer */
+/* ============================================================
+   BOTÕES "adesivo": dourado chapado com borda inferior sólida
+   ============================================================ */
+.btn-gold {
+  background: var(--color-gold);
+  color: var(--color-on-brand);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    0 2px 0 var(--color-gold-deep);
+}
+.btn-gold:hover {
+  background: var(--color-gold-soft);
+}
+.btn-gold:active {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 1px 0 var(--color-gold-deep);
+}
+
+/* ============================================================
+   CARREGAMENTO
+   ============================================================ */
 .skeleton {
   position: relative;
   overflow: hidden;
-  background: rgb(255 255 255 / 0.06);
+  background: rgb(255 248 238 / 0.05);
 }
 .skeleton::after {
   content: "";
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.09), rgb(251 191 36 / 0.06), transparent);
+  background: linear-gradient(90deg, transparent, rgb(255 248 238 / 0.07), rgb(245 165 36 / 0.07), transparent);
   animation: shimmer 1.25s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 @keyframes shimmer {
   to {
     transform: translateX(100%);
   }
-}
-
-@keyframes drift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(4%, -3%, 0) scale(1.08);
-  }
-}
-.orb {
-  animation: drift 18s ease-in-out infinite;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -151,36 +226,83 @@ body {
   height: 6px;
 }
 .thin-scroll::-webkit-scrollbar-thumb {
-  background: rgb(255 255 255 / 0.12);
+  background: var(--color-line);
   border-radius: 99px;
 }
 .thin-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgb(255 255 255 / 0.12) transparent;
+  scrollbar-color: var(--color-line) transparent;
 }
 
 input,
-textarea {
+textarea,
+select {
   font-size: 16px; /* evita zoom no iOS */
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .orb,
-  .skeleton::after {
-    animation: none;
-  }
+/* Foco visível e consistente (acessibilidade) */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
 }
 
 /* Vapor das ilustrações */
 @keyframes steam {
-  0% { opacity: 0; transform: translateY(6px); }
-  40% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(-8px); }
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
 .steam path {
   animation: steam 2.4s ease-in-out infinite;
   transform-box: fill-box;
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .steam path { animation: none; opacity: .6; }
+  .skeleton::after,
+  .steam path {
+    animation: none;
+  }
+  .steam path {
+    opacity: 0.6;
+  }
+}
+
+/* ============================================================
+   COMANDA TÉRMICA 80mm — só o que estiver em .comanda vai pro papel
+   ============================================================ */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .comanda,
+  .comanda * {
+    visibility: visible !important;
+  }
+  .comanda {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 72mm;
+    padding: 0;
+    margin: 0;
+    background: #fff !important;
+    color: #000 !important;
+    font-family: ui-monospace, "Courier New", monospace;
+    font-size: 11pt;
+    line-height: 1.35;
+  }
+  .comanda .corte {
+    border-top: 1px dashed #000;
+  }
+  @page {
+    size: 80mm auto;
+    margin: 3mm;
+  }
 }

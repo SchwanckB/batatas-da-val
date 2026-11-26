@@ -11,7 +11,8 @@ import { Spotlight } from "@/components/ui/Spotlight";
 import { Switch } from "@/components/ui/Switch";
 import { SECTION_ICONS } from "@/components/ui/sectionIcons";
 import { cn, money, uid } from "@/lib/format";
-import { useStore } from "@/lib/store";
+import { useAdmin, useAdminActions } from "@/lib/adminStore";
+import { useToast } from "@/lib/toast";
 import type { Product, Section, SectionIcon } from "@/lib/types";
 import { newProduct, ProductEditor } from "./ProductEditor";
 
@@ -21,13 +22,13 @@ export function MenuPanel() {
   const [tab, setTab] = useState<Tab>("secoes");
   const [editing, setEditing] = useState<Product | null>(null);
   const [filter, setFilter] = useState<string>("todas");
-  const { shared } = useStore();
+  const { state: shared } = useAdmin();
   const firstSection = [...shared.sections].sort((a, b) => a.order - b.order)[0]?.id ?? "";
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="glass flex rounded-full p-1">
+        <div className="panel flex rounded-full p-1">
           {(
             [
               ["secoes", "Seções"],
@@ -35,7 +36,7 @@ export function MenuPanel() {
             ] as [Tab, string][]
           ).map(([id, label]) => (
             <button key={id} onClick={() => setTab(id)} className={cn("relative rounded-full px-5 py-2 text-sm font-semibold transition-colors", tab === id ? "text-on-brand" : "text-zinc-400 hover:text-white")}>
-              {tab === id && <motion.span layoutId="menu-tab" transition={{ type: "spring", stiffness: 420, damping: 34 }} className="absolute inset-0 rounded-full bg-gradient-to-b from-amber-200 to-amber-400" />}
+              {tab === id && <motion.span layoutId="menu-tab" transition={{ type: "spring", stiffness: 420, damping: 34 }} className="absolute inset-0 rounded-full bg-gold" />}
               <span className="relative">
                 {label}
                 <span className="ml-1.5 opacity-60">{id === "secoes" ? shared.sections.length : shared.products.length}</span>
@@ -69,7 +70,9 @@ export function MenuPanel() {
 }
 
 function SectionsList({ onOpenSection }: { onOpenSection: (id: string) => void }) {
-  const { shared, saveSection, moveSection, deleteSection, toast } = useStore();
+  const { state: shared } = useAdmin();
+  const { saveSection, moveSection, deleteSection } = useAdminActions();
+  const { toast } = useToast();
   const [editing, setEditing] = useState<Section | null>(null);
   const list = [...shared.sections].sort((a, b) => a.order - b.order);
   const visibleCount = list.filter((s) => s.active && shared.products.some((p) => p.category === s.id)).length;
@@ -80,7 +83,7 @@ function SectionsList({ onOpenSection }: { onOpenSection: (id: string) => void }
         <span className="flex items-center gap-2">
           <Eye className="h-4 w-4 text-amber-300" /> Só as seções <b>marcadas</b> aparecem para os clientes. {visibleCount} de {list.length} visíveis agora.
         </span>
-        <Press variant="glass" className="h-9 px-3 text-xs" onClick={() => setEditing({ id: `s-${uid()}`, name: "", icon: "star", active: false, order: 999 })}>
+        <Press variant="panel" className="h-9 px-3 text-xs" onClick={() => setEditing({ id: `s-${uid()}`, name: "", icon: "star", active: false, order: 999 })}>
           <Plus className="h-3.5 w-3.5" /> Nova seção
         </Press>
       </div>
@@ -125,12 +128,18 @@ function SectionsList({ onOpenSection }: { onOpenSection: (id: string) => void }
                       <Switch
                         label={`Mostrar ${s.name} para clientes`}
                         checked={s.active}
-                        onChange={(v) => {
-                          saveSection({ ...s, active: v });
-                          toast({ title: v ? "Seção visível" : "Seção oculta", subtitle: s.name, icon: v ? <Eye className="h-4.5 w-4.5 text-amber-300" /> : <EyeOff className="h-4.5 w-4.5 text-zinc-300" /> });
+                        onChange={async (v) => {
+                          const err = await saveSection({ ...s, active: v });
+                          if (err) toast({ title: "Não salvou", subtitle: err, tone: "erro" });
+                          else
+                            toast({
+                              title: v ? "Seção visível no cardápio" : "Seção oculta",
+                              subtitle: s.name,
+                              icon: v ? <Eye className="h-4.5 w-4.5 text-amber-300" /> : <EyeOff className="h-4.5 w-4.5 text-zinc-300" />,
+                            });
                         }}
                       />
-                      <span className="text-2xs font-semibold uppercase tracking-wider text-zinc-500">{s.active ? "Visível" : "Oculta"}</span>
+                      <span className="text-2xs font-semibold text-zinc-500">{s.active ? "visível" : "oculta"}</span>
                     </div>
                   </div>
                 </Spotlight>
@@ -145,14 +154,23 @@ function SectionsList({ onOpenSection }: { onOpenSection: (id: string) => void }
         exists={!!editing && shared.sections.some((x) => x.id === editing.id)}
         canDelete={!!editing && !shared.products.some((p) => p.category === editing.id)}
         onClose={() => setEditing(null)}
-        onSave={(sec) => {
-          saveSection(sec);
-          toast({ title: "Seção salva", subtitle: sec.name, icon: <Check className="h-4.5 w-4.5 text-emerald-300" /> });
+        onSave={async (sec) => {
           setEditing(null);
+          const err = await saveSection(sec);
+          toast(
+            err
+              ? { title: "Não salvou", subtitle: err, tone: "erro" }
+              : { title: "Seção salva", subtitle: sec.name, icon: <Check className="h-4.5 w-4.5 text-[#7fd79a]" /> },
+          );
         }}
-        onDelete={(sec) => {
-          if (deleteSection(sec.id)) toast({ title: "Seção excluída", subtitle: sec.name, icon: <Trash2 className="h-4.5 w-4.5 text-rose-300" /> });
+        onDelete={async (sec) => {
           setEditing(null);
+          const err = await deleteSection(sec.id);
+          toast(
+            err
+              ? { title: "Não excluiu", subtitle: err, tone: "erro" }
+              : { title: "Seção excluída", subtitle: sec.name, icon: <Trash2 className="h-4.5 w-4.5 text-brasa" /> },
+          );
         }}
       />
     </div>
@@ -189,10 +207,10 @@ function SectionEditor({
             if (valid) onSave({ ...d, name: d.name.trim() });
           }}
         >
-          <h2 className="pr-10 text-xl font-extrabold text-white">{exists ? "Editar seção" : "Nova seção"}</h2>
-          <input autoFocus value={d.name} onChange={(e) => set({ name: e.target.value })} maxLength={32} placeholder="Ex.: Xis, Hambúrgueres, Torres de Batata" className="w-full rounded-control bg-white/[0.04] px-4 py-3 text-white ring-1 ring-white/10 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-400/40" />
+          <h2 className="letreiro pr-10 text-2xl text-white">{exists ? "Editar seção" : "Nova seção"}</h2>
+          <input autoFocus value={d.name} onChange={(e) => set({ name: e.target.value })} maxLength={32} placeholder="Ex.: Xis, Hambúrgueres, Torres de Batata" className="w-full rounded-control border border-line bg-ink px-4 py-3 text-white placeholder:text-zinc-500 focus:border-amber-400/60 focus:outline-none" />
           <div className="space-y-2">
-            <p className="text-2xs font-bold uppercase tracking-widest text-zinc-400">Ícone</p>
+            <p className="text-small font-semibold text-zinc-200">Ícone</p>
             <div className="grid grid-cols-6 gap-1.5">
               {(Object.keys(SECTION_ICONS) as SectionIcon[]).map((k) => {
                 const { Icon, label } = SECTION_ICONS[k];
@@ -228,7 +246,8 @@ function SectionEditor({
 }
 
 function ProductsList({ filter, setFilter, onEdit }: { filter: string; setFilter: (f: string) => void; onEdit: (p: Product) => void }) {
-  const { shared, saveProduct } = useStore();
+  const { state: shared } = useAdmin();
+  const { saveProduct } = useAdminActions();
   const [q, setQ] = useState("");
   const sections = [...shared.sections].sort((a, b) => a.order - b.order);
   const sectionName = (id: string) => sections.find((s) => s.id === id)?.name ?? "Sem seção";
@@ -244,7 +263,7 @@ function ProductsList({ filter, setFilter, onEdit }: { filter: string; setFilter
   return (
     <div className="space-y-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <label className="glass flex flex-1 items-center gap-2 rounded-full px-4 py-2.5 focus-within:ring-2 focus-within:ring-amber-400/40">
+        <label className="panel flex flex-1 items-center gap-2 rounded-full px-4 py-2.5 focus-within:border-amber-400/60">
           <Search className="h-4 w-4 text-zinc-400" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar produto" className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-zinc-500 focus:outline-none" />
         </label>
@@ -278,14 +297,14 @@ function ProductsList({ filter, setFilter, onEdit }: { filter: string; setFilter
                   </div>
                   <div className="flex flex-col items-center gap-0.5">
                     <Switch size="sm" label={`${p.name} disponível`} checked={p.available} onChange={(v) => saveProduct({ ...p, available: v })} />
-                    <span className={cn("text-2xs font-semibold uppercase tracking-wider", p.available ? "text-zinc-500" : "text-rose-300")}>{p.available ? "Ativo" : "Esgotado"}</span>
+                    <span className={cn("text-2xs font-semibold", p.available ? "text-zinc-500" : "text-[#ff8f82]")}>{p.available ? "ativo" : "esgotado"}</span>
                   </div>
                 </div>
               </Spotlight>
             </motion.div>
           ))}
         </AnimatePresence>
-        {list.length === 0 && <p className="glass col-span-full rounded-card py-12 text-center text-sm text-zinc-400">Nenhum produto aqui ainda. Clique em “Novo produto”.</p>}
+        {list.length === 0 && <p className="col-span-full rounded-card border border-dashed border-line py-12 text-center text-sm text-zinc-500">Nenhum produto aqui ainda. Toque em “Novo produto”.</p>}
       </div>
     </div>
   );
@@ -300,7 +319,7 @@ export function MenuSkeleton() {
       </div>
       <Skeleton className="h-12 w-full rounded-card" />
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="glass flex items-center gap-3 rounded-card p-3.5">
+        <div key={i} className="panel flex items-center gap-3 rounded-card p-3.5">
           <Skeleton className="h-11 w-11 rounded-control" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-40" />

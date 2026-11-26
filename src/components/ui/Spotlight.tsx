@@ -1,24 +1,15 @@
 "use client";
 
-import { useRef, type HTMLAttributes } from "react";
+import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/format";
 
-/** Card de vidro com brilho radial que acompanha o cursor (borda + superfície). */
+/**
+ * Card com realce de hover quente e discreto. O brilho que seguia o cursor
+ * saiu: ele dava aquele ar de template de IA.
+ */
 export function Spotlight({ className, children, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  const ref = useRef<HTMLDivElement>(null);
   return (
-    <div
-      ref={ref}
-      onPointerMove={(e) => {
-        const el = ref.current;
-        if (!el || e.pointerType !== "mouse") return;
-        const r = el.getBoundingClientRect();
-        el.style.setProperty("--mx", `${e.clientX - r.left}px`);
-        el.style.setProperty("--my", `${e.clientY - r.top}px`);
-      }}
-      className={cn("spotlight glass rounded-3xl", className)}
-      {...rest}
-    >
+    <div className={cn("spotlight", className)} {...rest}>
       {children}
     </div>
   );

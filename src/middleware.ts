@@ -1,36 +1,23 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { SUPABASE_KEY, SUPABASE_URL, supabaseConfigured } from "@/lib/supabase/env";
+import { SESSION_COOKIE, authConfigured, verifySession } from "@/lib/auth/session";
 
-/** Protege /admin: só entra quem estiver logado no Supabase. Sem login → /admin/login. */
+/** Protege /admin: só entra quem tem sessão assinada. Sem sessão → /admin/login. */
 export async function middleware(request: NextRequest) {
   const isLogin = request.nextUrl.pathname.startsWith("/admin/login");
 
-  // Falha fechada: sem Supabase configurado ninguém acessa o painel.
-  if (!supabaseConfigured) {
+  // Falha fechada: sem AUTH_SECRET ninguém acessa o painel.
+  if (!authConfigured()) {
     return isLogin ? NextResponse.next() : NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
-  let response = NextResponse.next({ request });
-  const supabase = createServerClient(SUPABASE_URL, SUPABASE_KEY, {
-    cookies: {
-      getAll: () => request.cookies.getAll(),
-      setAll: (toSet, headers) => {
-        toSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-        Object.entries(headers ?? {}).forEach(([k, v]) => response.headers.set(k, v));
-      },
-    },
-  });
+  const session = await verifySession(request.cookies.get(SESSION_COOKIE)?.value);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user && !isLogin) return NextResponse.redirect(new URL("/admin/login", request.url));
-  if (user && isLogin) return NextResponse.redirect(new URL("/admin", request.url));
-  return response;
+  if (!session && !isLogin) {
+    const url = new URL("/admin/login", request.url);
+    return NextResponse.redirect(url);
+  }
+  if (session && isLogin) return NextResponse.redirect(new URL("/admin", request.url));
+  return NextResponse.next();
 }
 
 export const config = { matcher: ["/admin", "/admin/:path*"] };

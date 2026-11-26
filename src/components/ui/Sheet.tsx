@@ -84,7 +84,7 @@ export function Sheet({ open, onClose, children, side = "center", className, lab
               if (info.offset.y > 110 || info.velocity.y > 600) onClose();
             }}
             className={cn(
-              "glass-strong absolute flex flex-col overflow-hidden",
+              "panel-strong absolute flex flex-col overflow-hidden",
               desktop
                 ? side === "right"
                   ? "inset-y-3 right-3 w-[440px] rounded-panel"

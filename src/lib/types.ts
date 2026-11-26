@@ -16,16 +16,8 @@ export interface Section {
 
 export type TintKey = "gold" | "red" | "cream" | "bev" | "green";
 export type SizeId = "media" | "gigante";
-export type IngredientId =
-  | "batata"
-  | "strogonoff"
-  | "frango"
-  | "catupiry"
-  | "cheddar"
-  | "bacon"
-  | "mussarela"
-  | "palha"
-  | "embalagem";
+/** Insumos são cadastráveis no painel, então o id é livre. */
+export type IngredientId = string;
 
 export type Recipe = Partial<Record<IngredientId, number>>;
 
@@ -63,6 +55,7 @@ export interface Extra {
   price: number;
   ingredient: IngredientId;
   amount: number;
+  active: boolean;
 }
 
 export interface CartItem {
@@ -76,7 +69,7 @@ export interface CartItem {
   unitPrice: number;
 }
 
-export type OrderStatus = "novo" | "preparo" | "entrega" | "concluido";
+export type OrderStatus = "novo" | "preparo" | "entrega" | "concluido" | "cancelado";
 export type PaymentMethod = "pix" | "cartao" | "dinheiro";
 
 export interface Neighborhood {
@@ -84,12 +77,24 @@ export interface Neighborhood {
   name: string;
   hint: string;
   fee: number;
-  eta: string;
+  /** Minutos estimados de entrega (mín/máx). */
+  etaMin: number;
+  etaMax: number;
   pickup?: boolean;
+  active: boolean;
+  order: number;
+}
+
+export interface OrderRating {
+  stars: number;
+  comment: string;
+  at: number;
 }
 
 export interface Order {
   id: number;
+  /** Chave pública para acompanhar o pedido por link (nunca o id sequencial). */
+  token: string;
   createdAt: number;
   updatedAt: number;
   customer: { name: string; phone: string; address: string };
@@ -97,17 +102,23 @@ export interface Order {
   items: CartItem[];
   subtotal: number;
   deliveryFee: number;
+  discount: number;
+  couponCode?: string;
   total: number;
   payment: PaymentMethod;
   changeFor?: number;
   status: OrderStatus;
   stockDeducted: boolean;
+  cancelReason?: string;
+  rating?: OrderRating;
+  /** Momento em que cada status foi atingido. */
+  history: { status: OrderStatus; at: number }[];
 }
 
 export interface Ingredient {
   id: IngredientId;
   name: string;
-  unit: "kg" | "pct" | "un";
+  unit: "kg" | "pct" | "un" | "l";
   qty: number;
   min: number;
   max: number;
@@ -120,6 +131,96 @@ export interface CashEntry {
   description: string;
   amount: number;
   at: number;
+  by?: string;
+}
+
+/** Turno de caixa: abertura com fundo de troco e fechamento com conferência. */
+export interface CashShift {
+  id: string;
+  openedAt: number;
+  openedBy: string;
+  openingFloat: number;
+  closedAt?: number;
+  closedBy?: string;
+  /** Valor contado na gaveta no fechamento. */
+  counted?: number;
+  note?: string;
+}
+
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+export interface DayHours {
+  open: boolean;
+  /** "19:30" */
+  from: string;
+  /** "23:30" — depois da meia-noite use "00:30". */
+  to: string;
+}
+
+/** Faixa de aviso na tela inicial do cliente, escrita no painel. */
+export interface Notice {
+  id: string;
+  text: string;
+  tone: "info" | "aviso" | "promo";
+  active: boolean;
+}
+
+export interface StoreSettings {
+  name: string;
+  slogan: string;
+  city: string;
+  address: string;
+  phone: string;
+  whatsapp: string;
+  instagram: string;
+  /** Chave Pix (telefone, e-mail, CPF/CNPJ ou aleatória). */
+  pixKey: string;
+  /** Nome do recebedor no Pix (até 25 caracteres). */
+  pixName: string;
+  pixCity: string;
+  hours: Record<Weekday, DayHours>;
+  /** Pedidos pausados manualmente (loja cheia, falta de insumo…). */
+  paused: boolean;
+  pausedMessage: string;
+  minOrder: number;
+  prepMinutes: number;
+  /** Avisos exibidos no topo do cardápio (alta demanda, feriado, promoção…). */
+  notices: Notice[];
+}
+
+export type CouponKind = "fixo" | "percent";
+
+export interface Coupon {
+  id: string;
+  code: string;
+  kind: CouponKind;
+  /** Reais (fixo) ou porcentagem (percent). */
+  value: number;
+  minOrder: number;
+  maxUses: number;
+  uses: number;
+  /** Timestamp de validade (null = sem prazo). */
+  expiresAt: number | null;
+  active: boolean;
+}
+
+export type Role = "dono" | "cozinha" | "caixa";
+
+export interface User {
+  id: string;
+  name: string;
+  login: string;
+  role: Role;
+  passwordHash: string;
+  salt: string;
+  createdAt: number;
+}
+
+export interface AuditEntry {
+  id: string;
+  at: number;
+  actor: string;
+  summary: string;
 }
 
 export interface SharedState {
@@ -128,16 +229,34 @@ export interface SharedState {
   orders: Order[];
   stock: Ingredient[];
   cash: CashEntry[];
-  openingFloat: number;
+  shifts: CashShift[];
   sections: Section[];
   products: Product[];
+  extras: Extra[];
+  neighborhoods: Neighborhood[];
+  coupons: Coupon[];
+  settings: StoreSettings;
+  users: User[];
+  audit: AuditEntry[];
+}
+
+/** Estado visível ao cliente: cardápio, entrega e configurações públicas. */
+export interface PublicState {
+  rev: number;
+  sections: Section[];
+  products: Product[];
+  extras: Extra[];
+  neighborhoods: Neighborhood[];
+  settings: Omit<StoreSettings, "pixKey" | "pixName" | "pixCity">;
 }
 
 export interface ClientState {
   cart: CartItem[];
   neighborhoodId: string | null;
-  trackedOrderId: number | null;
+  /** Tokens dos pedidos feitos neste aparelho (mais recente primeiro). */
+  orderTokens: string[];
   customer: { name: string; phone: string; address: string };
+  couponCode: string;
 }
 
 export type Topping = "carne" | "frango" | "bacon" | "ervas" | "palha" | "queijo";
