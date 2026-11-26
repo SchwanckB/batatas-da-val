@@ -8,7 +8,7 @@ export const spring = { type: "spring", stiffness: 400, damping: 25 } as const;
 type Variant = "cta" | "glass" | "gold" | "ghost";
 
 const styles: Record<Variant, string> = {
-  cta: "bg-gradient-to-b from-rose-500 to-red-600 text-white shadow-[0_8px_30px_-8px_rgba(225,29,72,0.75),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_10px_40px_-6px_rgba(225,29,72,0.95),inset_0_1px_0_rgba(255,255,255,0.35)]",
+  cta: "bg-gradient-to-b from-amber-300 to-amber-500 text-on-brand shadow-[0_8px_30px_-8px_rgba(245,158,11,0.75),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_10px_40px_-6px_rgba(245,158,11,0.95),inset_0_1px_0_rgba(255,255,255,0.35)]",
   gold: "bg-gradient-to-b from-amber-300 to-amber-500 text-on-brand shadow-[0_8px_30px_-10px_rgba(245,158,11,0.8),inset_0_1px_0_rgba(255,255,255,0.5)]",
   glass: "glass text-zinc-100 hover:bg-white/10",
   ghost: "text-zinc-300 hover:bg-white/[0.06] hover:text-white",

@@ -68,7 +68,7 @@ export function Header({ onOpenCart, onPickNeighborhood }: { onOpenCart: () => v
           transition={spring}
           onClick={onOpenCart}
           aria-label={`Abrir carrinho (${count} itens)`}
-          className="relative grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-b from-rose-500 to-red-600 text-white shadow-[0_8px_24px_-6px_rgba(225,29,72,0.8),inset_0_1px_0_rgba(255,255,255,0.3)]"
+          className="relative grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-b from-amber-300 to-amber-500 text-on-brand shadow-[0_8px_24px_-6px_rgba(245,158,11,0.8),inset_0_1px_0_rgba(255,255,255,0.3)]"
         >
           <ShoppingBag className="h-5 w-5" />
           {count > 0 && (
@@ -77,7 +77,7 @@ export function Header({ onOpenCart, onPickNeighborhood }: { onOpenCart: () => v
               initial={{ scale: 0.4 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 600, damping: 14 }}
-              className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-amber-300 px-1 text-2xs font-extrabold text-on-brand ring-2 ring-surface"
+              className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1 text-2xs font-extrabold text-amber-300 ring-2 ring-amber-300"
             >
               {count}
             </motion.span>

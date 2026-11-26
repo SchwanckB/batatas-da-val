@@ -51,7 +51,7 @@ export function ProductCard({ product: p, onOpen, onQuickAdd }: Props) {
                 e.stopPropagation();
                 onQuickAdd(p, e.currentTarget);
               }}
-              className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-b from-rose-500 to-red-600 text-white shadow-[0_6px_20px_-4px_rgba(225,29,72,0.8),inset_0_1px_0_rgba(255,255,255,0.35)]"
+              className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-b from-amber-300 to-amber-500 text-on-brand shadow-[0_6px_20px_-4px_rgba(245,158,11,0.8),inset_0_1px_0_rgba(255,255,255,0.35)]"
             >
               <Plus className="h-5 w-5" strokeWidth={2.4} />
             </motion.button>

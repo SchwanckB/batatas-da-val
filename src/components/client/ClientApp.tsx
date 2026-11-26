@@ -212,9 +212,9 @@ export function ClientApp() {
               whileTap={{ scale: 0.97 }}
               onClick={() => openCart("cart")}
               data-cart-target
-              className="flex h-14 w-full items-center gap-3 rounded-card bg-gradient-to-b from-rose-500 to-red-600 px-4 text-white shadow-[0_16px_40px_-10px_rgba(225,29,72,0.85),inset_0_1px_0_rgba(255,255,255,0.3)]"
+              className="flex h-14 w-full items-center gap-3 rounded-card bg-gradient-to-b from-amber-300 to-amber-500 px-4 text-on-brand shadow-[0_16px_40px_-10px_rgba(245,158,11,0.85),inset_0_1px_0_rgba(255,255,255,0.3)]"
             >
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-white/20 text-sm font-extrabold">{count}</span>
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-black/15 text-sm font-extrabold">{count}</span>
               <span className="font-semibold">Ver sacola</span>
               <span className="ml-auto font-extrabold">{money(subtotal)}</span>
               <ChevronRight className="h-5 w-5" />

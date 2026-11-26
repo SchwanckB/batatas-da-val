@@ -48,7 +48,7 @@ export function Featured({ onOpen, onQuickAdd }: { onOpen: (p: Product) => void;
                       e.stopPropagation();
                       onQuickAdd(p, e.currentTarget);
                     }}
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-b from-rose-500 to-red-600 text-white shadow-[0_6px_20px_-4px_rgba(225,29,72,0.8)]"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-b from-amber-300 to-amber-500 text-on-brand shadow-[0_6px_20px_-4px_rgba(245,158,11,0.8)]"
                   >
                     <Plus className="h-4 w-4" strokeWidth={2.5} />
                   </motion.button>

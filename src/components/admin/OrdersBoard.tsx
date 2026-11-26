@@ -22,11 +22,11 @@ function actionLabel(o: Order) {
   const pickup = neighborhoodById(o.neighborhoodId)?.pickup;
   switch (o.status) {
     case "novo":
-      return { label: "Iniciar preparo", Icon: ChefHat, cls: "from-rose-500 to-red-600 text-white" };
+      return { label: "Iniciar preparo", Icon: ChefHat, cls: "from-amber-300 to-amber-500 text-on-brand" };
     case "preparo":
       return pickup
-        ? { label: "Pronto p/ retirada", Icon: Store, cls: "from-amber-300 to-amber-500 text-on-brand" }
-        : { label: "Enviar p/ entrega", Icon: Bike, cls: "from-amber-300 to-amber-500 text-on-brand" };
+        ? { label: "Pronto p/ retirada", Icon: Store, cls: "from-orange-300 to-orange-500 text-on-brand" }
+        : { label: "Enviar p/ entrega", Icon: Bike, cls: "from-orange-300 to-orange-500 text-on-brand" };
     case "entrega":
       return { label: pickup ? "Retirado" : "Entregue", Icon: Check, cls: "from-emerald-300 to-emerald-500 text-on-success" };
     default:

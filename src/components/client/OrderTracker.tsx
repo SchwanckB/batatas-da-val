@@ -30,7 +30,7 @@ export function OrderTracker({ order }: { order: Order }) {
     <div className="relative">
       <div className="absolute left-[22px] right-[22px] top-[21px] h-1 rounded-full bg-white/10">
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-rose-500 shadow-[0_0_14px_rgba(245,158,11,0.7)]"
+          className="h-full rounded-full bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 shadow-[0_0_14px_rgba(245,158,11,0.7)]"
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ type: "spring", stiffness: 120, damping: 22 }}
@@ -47,12 +47,12 @@ export function OrderTracker({ order }: { order: Order }) {
                 transition={current ? { repeat: Infinity, duration: 1.8 } : undefined}
                 className={cn(
                   "relative grid h-11 w-11 place-items-center rounded-full ring-1 transition-colors duration-500",
-                  done && "bg-amber-400 text-on-brand ring-amber-300",
-                  current && "bg-gradient-to-b from-rose-500 to-red-600 text-white ring-rose-300/60 shadow-[0_0_24px_rgba(225,29,72,0.6)]",
+                  done && "bg-amber-400/15 text-amber-300 ring-amber-400/40",
+                  current && "bg-gradient-to-b from-amber-300 to-amber-500 text-on-brand ring-amber-200/70 shadow-[0_0_24px_rgba(245,158,11,0.6)]",
                   !done && !current && "bg-surface text-zinc-400 ring-white/10",
                 )}
               >
-                {current && <span className="absolute inset-0 animate-ping rounded-full bg-rose-500/30" />}
+                {current && <span className="absolute inset-0 animate-ping rounded-full bg-amber-400/30" />}
                 <s.Icon className="relative h-5 w-5" />
               </motion.span>
               <span className={cn("text-2xs font-semibold leading-tight", current ? "text-white" : done ? "text-amber-200" : "text-zinc-400")}>

@@ -236,7 +236,7 @@ export function CartDrawer({ open, view, setView, onClose }: Props) {
                 <Totals subtotal={subtotal} fee={fee} nbName={nb?.name} total={total} />
                 <Press variant="cta" className="h-12 w-full text-base" onClick={submit} disabled={submitting || !client.cart.length}>
                   {submitting ? (
-                    <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }} className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white" />
+                    <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }} className="h-5 w-5 rounded-full border-2 border-on-brand/25 border-t-on-brand" />
                   ) : (
                     <>Finalizar Pedido • <AnimatedPrice value={total} /></>
                   )}

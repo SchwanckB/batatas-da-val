@@ -102,7 +102,7 @@ export function LoginForm({ configured }: { configured: boolean }) {
 
           <Press type="submit" variant="cta" className="mt-2 h-12 w-full text-base" disabled={loading || !configured}>
             {loading ? (
-              <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }} className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white" />
+              <motion.span animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }} className="h-5 w-5 rounded-full border-2 border-on-brand/25 border-t-on-brand" />
             ) : (
               "Entrar"
             )}
