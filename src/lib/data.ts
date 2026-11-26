@@ -59,9 +59,9 @@ export const SEED_SECTIONS: Section[] = [
   { id: "bebidas", name: "Bebidas", icon: "soda", active: true, order: 6 },
 ];
 
-export const SIZES: { id: SizeId; label: string; weight: string }[] = [
-  { id: "media", label: "Média", weight: "500g" },
-  { id: "gigante", label: "Batatão Gigante", weight: "800g" },
+export const SIZES: { id: SizeId; label: string; short: string; weight: string }[] = [
+  { id: "media", label: "Média", short: "Média", weight: "500 g" },
+  { id: "gigante", label: "Batatão Gigante", short: "Gigante", weight: "800 g" },
 ];
 
 export const SEED_EXTRAS: Extra[] = [

@@ -88,7 +88,10 @@ A cara é de **cardápio de esquina impresso**, não de landing page. Tokens em
   degradê curto, borda inferior sólida e um brilho quente discreto — nada de néon.
 - **Raios**: `rounded-control` (12px), `rounded-card` (18px), `rounded-panel` (24px).
   Não crie `rounded-[Npx]` nem `text-[Npx]` novos — crie token se precisar.
-- **Cardápio**: lista com linha pontilhada (`.guia`) até o preço, não grade de cards iguais.
+- **Cardápio** (`MenuBoard`): o cardápio inteiro fica na página, uma seção embaixo da outra.
+  A barra de categorias (`MenuNav`) é fixa, leva até a seção e se marca sozinha ao rolar.
+  Cada linha usa a guia pontilhada (`.guia`) até o preço — e uma linha de preço por tamanho
+  quando o produto tem Média e Gigante. No fim vêm os adicionais e o "Como funciona".
 - **Animações**: mantenha. Mola `stiffness 400 / damping 25` (`spring` em `Press.tsx`), item
   voando até a sacola, toasts, skeletons fiéis ao layout.
 - **Sem emojis** na interface; use ícones Lucide ou `DishArt`.

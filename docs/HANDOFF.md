@@ -15,7 +15,10 @@ preço — como um cardápio impresso. As animações continuam todas.
 ## 2. O que está pronto
 
 ### Cliente (`/`)
-- Cardápio com seções dinâmicas, busca por nome ou ingrediente, carrossel dos mais pedidos.
+- **Cardápio completo numa página só**: todas as seções listadas, barra de categorias fixa que
+  leva até cada uma e se marca sozinha ao rolar, preço por tamanho (Média e Gigante) em linhas
+  próprias, bloco de adicionais e as observações da casa no rodapé do cardápio.
+- Busca por nome ou ingrediente filtrando todas as seções de uma vez, e carrossel dos mais pedidos.
 - Faixa de **avisos escritos no painel** ("alta demanda hoje…") no topo do cardápio.
 - Selo **Aberto/Fechado calculado pelo horário real** (fuso de São Paulo, vira a meia-noite).
   Fora do horário o cardápio continua visível e o checkout fica bloqueado com a explicação.

@@ -8,13 +8,11 @@ import {
   ClipboardCheck,
   MapPin,
   PackageCheck,
-  Search,
-  SearchX,
   ShoppingBag,
   WifiOff,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { InstagramIcon } from "@/components/ui/InstagramIcon";
 import { Logo } from "@/components/ui/Logo";
 import { Sheet } from "@/components/ui/Sheet";
@@ -22,20 +20,20 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { spring } from "@/components/ui/Press";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { findNeighborhood, unitPriceFor } from "@/lib/data";
-import { cn, instagramUrl, money, norm, uid, waLink } from "@/lib/format";
+import { cn, instagramUrl, money, uid, waLink } from "@/lib/format";
 import { hoursLines } from "@/lib/hours";
 import { useMinDelay } from "@/lib/hooks";
 import { useMenu } from "@/lib/menuStore";
 import { useToast } from "@/lib/toast";
-import type { CategoryId, Order, OrderStatus, Product } from "@/lib/types";
+import type { Order, OrderStatus, Product } from "@/lib/types";
 import { CartDrawer, type CartView } from "./CartDrawer";
-import { CategoryTabs } from "./CategoryTabs";
 import { DishArt } from "./DishArt";
 import { Featured } from "./Featured";
 import { FlyLayer, type Flight } from "./FlyLayer";
 import { Header } from "./Header";
 import { Hero } from "./Hero";
-import { MenuRow, MenuRowSkeleton } from "./MenuRow";
+import { MenuBoard } from "./MenuBoard";
+import { MenuRowSkeleton } from "./MenuRow";
 import { MyOrders } from "./MyOrders";
 import { NeighborhoodList } from "./NeighborhoodPicker";
 import { Notices } from "./Notices";
@@ -72,8 +70,6 @@ export function ClientApp() {
   } = useMenu();
   const { toast } = useToast();
 
-  const [picked, setPicked] = useState<CategoryId | null>(null);
-  const [query, setQuery] = useState("");
   const [modal, setModal] = useState<Product | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartView, setCartView] = useState<CartView>("cart");
@@ -82,19 +78,8 @@ export function ClientApp() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const pendingToasts = useRef(new Map<string, ToastData>());
 
-  const sections = menu.sections;
-  const category = sections.some((s) => s.id === picked) ? picked! : (sections[0]?.id ?? "");
-
   const booted = useMinDelay(320);
   const ready = hydrated && booted;
-
-  const results = useMemo(() => {
-    const q = norm(query.trim());
-    const list = !q
-      ? menu.products.filter((p) => p.category === category)
-      : menu.products.filter((p) => norm([p.name, p.description, ...p.tags].join(" ")).includes(q));
-    return [...list].sort((a, b) => Number(b.available) - Number(a.available));
-  }, [query, category, menu.products]);
 
   // Avisa o cliente quando a cozinha muda o status do pedido que ele acompanha
   const lastStatus = useRef<OrderStatus | null>(null);
@@ -197,7 +182,6 @@ export function ClientApp() {
 
   if (!ready) return <ClientSkeleton />;
 
-  const catLabel = sections.find((c) => c.id === category)?.name;
   const pickupTracked = !!findNeighborhood(menu.neighborhoods, tracked?.neighborhoodId ?? "")?.pickup;
 
   return (
@@ -226,80 +210,12 @@ export function ClientApp() {
       <Featured products={menu.products} onOpen={setModal} onQuickAdd={quickAdd} />
 
       {/* Faixa de papel: é aqui que o cardápio vira cardápio */}
-      <section id="cardapio" className="papel mt-12 border-t-4 border-gold sm:mt-16">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="letreiro text-3xl text-paper-ink sm:text-4xl">Cardápio</h2>
-            <label className="flex min-w-60 flex-1 items-center gap-2.5 rounded-control border border-paper-ink/20 bg-paper-2 px-4 py-2.5 focus-within:border-paper-ink/50 sm:max-w-sm">
-              <Search className="h-4.5 w-4.5 shrink-0 text-zinc-600" aria-hidden />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar por nome ou ingrediente"
-                aria-label="Buscar no cardápio"
-                className="min-w-0 flex-1 bg-transparent text-paper-ink placeholder:text-zinc-500 focus:outline-none"
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  aria-label="Limpar busca"
-                  className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-paper-ink/10 text-zinc-600"
-                >
-                  <X className="h-3.5 w-3.5" aria-hidden />
-                </button>
-              )}
-            </label>
-          </div>
-
-          {!query ? (
-            <div className="sticky top-25 z-30 -mx-4 mt-5 bg-paper px-4 sm:-mx-6 sm:px-6 md:top-17">
-              <CategoryTabs sections={sections} value={category} onChange={setPicked} />
-            </div>
-          ) : (
-            <p className="mt-5 border-b border-paper-ink/15 pb-3 text-sm text-zinc-600">
-              {results.length} {results.length === 1 ? "resultado" : "resultados"} para{" "}
-              <b className="text-paper-ink">“{query}”</b>
-            </p>
-          )}
-
-          {!query && catLabel && (
-            <div className="mt-6 flex items-baseline justify-between gap-4">
-              <h3 className="letreiro text-2xl text-paper-ink">{catLabel}</h3>
-              <span className="text-small tnum text-zinc-600">
-                {results.length} {results.length === 1 ? "opção" : "opções"}
-              </span>
-            </div>
-          )}
-
-          <AnimatePresence mode="wait" initial={false}>
-            {results.length ? (
-              <motion.ul
-                key={query ? "busca" : category}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="mt-2 lg:grid lg:grid-cols-2 lg:gap-x-10"
-              >
-                {results.map((p) => (
-                  <MenuRow key={p.id} product={p} onOpen={setModal} onQuickAdd={quickAdd} />
-                ))}
-              </motion.ul>
-            ) : (
-              <motion.div
-                key="vazio"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 flex flex-col items-center gap-2 rounded-card border border-dashed border-paper-ink/25 py-14 text-center"
-              >
-                <SearchX className="h-7 w-7 text-zinc-500" aria-hidden />
-                <p className="font-bold text-paper-ink">Não encontramos esse item</p>
-                <p className="text-sm text-zinc-600">Tente “frango”, “bacon” ou “cheddar”.</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </section>
+      <MenuBoard
+        menu={menu}
+        minOrder={menu.settings.minOrder}
+        onOpen={setModal}
+        onQuickAdd={quickAdd}
+      />
 
       <Footer />
 
