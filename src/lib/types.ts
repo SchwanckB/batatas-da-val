@@ -1,4 +1,20 @@
-export type CategoryId = "tradicionais" | "especiais" | "porcoes" | "bebidas";
+/** Id de uma seção do cardápio (criada/gerenciada no painel). */
+export type CategoryId = string;
+
+export type SectionIcon =
+  | "flame" | "crown" | "utensils" | "soda" | "sandwich" | "beef" | "layers"
+  | "pizza" | "drumstick" | "salad" | "dessert" | "star";
+
+export interface Section {
+  id: string;
+  name: string;
+  icon: SectionIcon;
+  /** Só aparece para os clientes quando marcada no painel. */
+  active: boolean;
+  order: number;
+}
+
+export type TintKey = "gold" | "red" | "cream" | "bev" | "green";
 export type SizeId = "media" | "gigante";
 export type IngredientId =
   | "batata"
@@ -24,11 +40,14 @@ export interface Product {
   priceGigante?: number;
   badges: Badge[];
   tags: string[];
-  emoji: string;
-  /** Ilustração vetorial do produto. */
+  /** Ilustração vetorial do produto (usada quando não há foto). */
   art: DishArtSpec;
-  /** Gradiente do card (classes Tailwind). */
-  tint: string;
+  /** Foto opcional (data URL ou URL pública). */
+  image?: string;
+  /** Cor de fundo da vitrine. */
+  tint: TintKey;
+  /** Disponível para venda (false = "Esgotado"). */
+  available: boolean;
   allowsExtras: boolean;
   recipe: Recipe;
   /** Receita para tamanho gigante (quando houver). */
@@ -50,7 +69,6 @@ export interface CartItem {
   uid: string;
   productId: string;
   name: string;
-  emoji: string;
   size?: SizeId;
   extras: string[];
   notes: string;
@@ -111,6 +129,8 @@ export interface SharedState {
   stock: Ingredient[];
   cash: CashEntry[];
   openingFloat: number;
+  sections: Section[];
+  products: Product[];
 }
 
 export interface ClientState {
@@ -126,5 +146,7 @@ export type DishArtSpec =
   | { kind: "batatao"; sauce: string; sauce2?: string; toppings: Topping[] }
   | { kind: "porcao"; sauce?: string; toppings: Topping[] }
   | { kind: "pote" }
+  | { kind: "lanche"; style: "xis" | "burger"; cheese?: boolean; bacon?: boolean; egg?: boolean }
+  | { kind: "torre"; sauce?: string; toppings: Topping[] }
   | { kind: "lata"; color: string; label: string }
   | { kind: "garrafa"; color: string; liquid: string; label: string };

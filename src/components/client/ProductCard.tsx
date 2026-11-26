@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { Spotlight } from "@/components/ui/Spotlight";
 import { spring } from "@/components/ui/Press";
-import { money } from "@/lib/format";
+import { cn, money } from "@/lib/format";
 import type { Product } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 import { BadgeChip } from "./Badges";
@@ -16,15 +16,20 @@ interface Props {
 }
 
 export function ProductCard({ product: p, onOpen, onQuickAdd }: Props) {
+  const soldOut = !p.available;
   return (
-    <Spotlight className="group h-full">
+    <Spotlight className={cn("group h-full", soldOut && "opacity-55 grayscale-[0.6]")}>
       <div
         role="button"
         tabIndex={0}
         aria-label={`Ver detalhes: ${p.name}`}
-        onClick={() => onOpen(p)}
-        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onOpen(p))}
-        className="relative z-[1] flex h-full cursor-pointer gap-4 p-3.5 outline-none sm:flex-col sm:p-4"
+        aria-disabled={soldOut}
+        onClick={() => !soldOut && onOpen(p)}
+        onKeyDown={(e) => !soldOut && (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onOpen(p))}
+        className={cn(
+          "relative z-[1] flex h-full gap-4 p-3.5 outline-none sm:flex-col sm:p-4",
+          soldOut ? "cursor-not-allowed" : "cursor-pointer",
+        )}
       >
         <ProductArt product={p} className="h-[104px] w-[104px] shrink-0 rounded-2xl sm:h-40 sm:w-full" />
         <div className="flex min-w-0 flex-1 flex-col">
@@ -42,6 +47,11 @@ export function ProductCard({ product: p, onOpen, onQuickAdd }: Props) {
               {p.priceGigante && <p className="text-2xs font-medium uppercase tracking-wider text-zinc-400">a partir de</p>}
               <p className="text-lg font-extrabold tracking-tight text-amber-300">{money(p.price)}</p>
             </div>
+            {soldOut ? (
+              <span className="rounded-full bg-white/[0.08] px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-zinc-300 ring-1 ring-white/10">
+                Esgotado
+              </span>
+            ) : (
             <motion.button
               aria-label={`Adicionar ${p.name}`}
               whileHover={{ scale: 1.08 }}
@@ -55,6 +65,7 @@ export function ProductCard({ product: p, onOpen, onQuickAdd }: Props) {
             >
               <Plus className="h-5 w-5" strokeWidth={2.4} />
             </motion.button>
+            )}
           </div>
         </div>
       </div>

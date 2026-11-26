@@ -4,13 +4,13 @@ import { motion } from "framer-motion";
 import { Flame, Plus } from "lucide-react";
 import { Spotlight } from "@/components/ui/Spotlight";
 import { spring } from "@/components/ui/Press";
-import { PRODUCTS } from "@/lib/data";
 import { money } from "@/lib/format";
 import type { Product } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
 
-export function Featured({ onOpen, onQuickAdd }: { onOpen: (p: Product) => void; onQuickAdd: (p: Product, el: HTMLElement) => void }) {
-  const items = PRODUCTS.filter((p) => p.featured);
+export function Featured({ products, onOpen, onQuickAdd }: { products: Product[]; onOpen: (p: Product) => void; onQuickAdd: (p: Product, el: HTMLElement) => void }) {
+  const items = products.filter((p) => p.featured && p.available);
+  if (!items.length) return null;
   return (
     <section className="mx-auto mt-8 max-w-6xl">
       <div className="mb-3 flex items-center gap-2 px-4 sm:px-6">

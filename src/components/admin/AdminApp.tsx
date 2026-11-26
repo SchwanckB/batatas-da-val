@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { BellRing, Boxes, ClipboardList, LogOut, RotateCcw, Wallet } from "lucide-react";
+import { BellRing, BookOpen, Boxes, ClipboardList, LogOut, RotateCcw, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useRef, useState } from "react";
@@ -12,11 +12,13 @@ import { useMinDelay, useStore } from "@/lib/store";
 import { BoardSkeleton, OrdersBoard } from "./OrdersBoard";
 import { CashPanel, CashSkeleton } from "./CashPanel";
 import { StockPanel, StockSkeleton } from "./StockPanel";
+import { MenuPanel, MenuSkeleton } from "./MenuPanel";
 
-type Module = "pedidos" | "caixa" | "estoque";
+type Module = "pedidos" | "cardapio" | "caixa" | "estoque";
 
 const MODULES: { id: Module; label: string; title: string; sub: string; Icon: typeof Wallet }[] = [
   { id: "pedidos", label: "Pedidos", title: "Pedidos em Aberto", sub: "Cozinha & Delivery em tempo real", Icon: ClipboardList },
+  { id: "cardapio", label: "Cardápio", title: "Personalizar Cardápio", sub: "Seções visíveis e produtos", Icon: BookOpen },
   { id: "caixa", label: "Caixa", title: "Gestão de Caixa", sub: "Frente de caixa do turno", Icon: Wallet },
   { id: "estoque", label: "Estoque", title: "Controle de Estoque", sub: "Insumos e alertas de reposição", Icon: Boxes },
 ];
@@ -38,6 +40,7 @@ export function AdminApp({ userEmail }: { userEmail: string }) {
 
   const badges: Record<Module, number> = {
     pedidos: shared.orders.filter((o) => o.status === "novo").length,
+    cardapio: shared.products.filter((p) => !p.available).length,
     caixa: 0,
     estoque: shared.stock.filter((i) => stockLevel(i) === "critico").length,
   };
@@ -125,18 +128,18 @@ export function AdminApp({ userEmail }: { userEmail: string }) {
         <AnimatePresence mode="wait" initial={false}>
           {!ready || !modReady ? (
             <motion.div key={`sk-${mod}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-              {mod === "pedidos" ? <BoardSkeleton /> : mod === "caixa" ? <CashSkeleton /> : <StockSkeleton />}
+              {mod === "pedidos" ? <BoardSkeleton /> : mod === "cardapio" ? <MenuSkeleton /> : mod === "caixa" ? <CashSkeleton /> : <StockSkeleton />}
             </motion.div>
           ) : (
             <motion.div key={mod} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }}>
-              {mod === "pedidos" ? <OrdersBoard /> : mod === "caixa" ? <CashPanel /> : <StockPanel />}
+              {mod === "pedidos" ? <OrdersBoard /> : mod === "cardapio" ? <MenuPanel /> : mod === "caixa" ? <CashPanel /> : <StockPanel />}
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
       {/* Navegação inferior (mobile) */}
-      <nav className="glass-strong fixed inset-x-3 bottom-[max(env(safe-area-inset-bottom),12px)] z-50 grid grid-cols-3 gap-1 rounded-panel p-1.5 lg:hidden">
+      <nav className="glass-strong fixed inset-x-3 bottom-[max(env(safe-area-inset-bottom),12px)] z-50 grid grid-cols-4 gap-1 rounded-panel p-1.5 lg:hidden">
         {MODULES.map((m) => (
           <NavButton key={m.id} m={m} active={mod === m.id} badge={badges[m.id]} onClick={() => setMod(m.id)} layoutId="nav-pill-mob" compact />
         ))}

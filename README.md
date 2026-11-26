@@ -3,7 +3,9 @@
 Cardápio digital premium + painel administrativo protegido por login (Supabase), estética **Liquid Glass Gourmet**.
 
 - **Clientes** → `/` — cardápio, personalização, carrinho, checkout e acompanhamento do pedido
-- **Admin** → `/admin` — só pela URL, exige e-mail e senha. Kanban de pedidos, Caixa e Estoque.
+- **Admin** → `/admin` — só pela URL, exige e-mail e senha. Pedidos (Kanban), Cardápio (seções e produtos), Caixa e Estoque.
+
+> Continuando no VS Code com o Claude? Leia `docs/HANDOFF.md` e use `docs/PROMPT-MELHORIAS.md`.
 
 Stack: Next.js 15 (App Router) · TypeScript · Tailwind CSS v4 · Framer Motion · Lucide · Supabase Auth.
 

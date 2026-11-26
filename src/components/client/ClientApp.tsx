@@ -9,9 +9,9 @@ import { InstagramIcon } from "@/components/ui/InstagramIcon";
 import { Sheet } from "@/components/ui/Sheet";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { spring } from "@/components/ui/Press";
-import { CATEGORIES, PRODUCTS, neighborhoodById, unitPriceFor } from "@/lib/data";
+import { neighborhoodById, unitPriceFor } from "@/lib/data";
 import { money, STORE, uid } from "@/lib/format";
-import { useMinDelay, useStore } from "@/lib/store";
+import { useMinDelay, useStore, visibleSections } from "@/lib/store";
 import type { CategoryId, OrderStatus, Product } from "@/lib/types";
 import { CartDrawer, type CartView } from "./CartDrawer";
 import { CategoryTabs } from "./CategoryTabs";
@@ -38,7 +38,7 @@ const STATUS_MSG: Record<OrderStatus, { title: string; icon: ReactNode }> = {
 
 export function ClientApp() {
   const { hydrated, client, shared, addToCart, bumpCart, toast, setNeighborhood } = useStore();
-  const [category, setCategory] = useState<CategoryId>("tradicionais");
+  const [picked, setPicked] = useState<CategoryId | null>(null);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState<Product | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
@@ -47,15 +47,27 @@ export function ClientApp() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const pendingToasts = useRef(new Map<string, ToastData>());
 
+  // Só seções marcadas no painel (e com produtos) aparecem para o cliente
+  const sections = useMemo(() => visibleSections(shared), [shared]);
+  const catalog = useMemo(() => {
+    const ids = new Set(sections.map((s) => s.id));
+    return shared.products.filter((p) => ids.has(p.category));
+  }, [shared.products, sections]);
+  const category = sections.some((s) => s.id === picked) ? picked! : (sections[0]?.id ?? "");
+  const setCategory = setPicked;
+
   const booted = useMinDelay(380);
   const catReady = useMinDelay(280, category);
   const ready = hydrated && booted;
 
   const results = useMemo(() => {
     const q = norm(query.trim());
-    if (!q) return PRODUCTS.filter((p) => p.category === category);
-    return PRODUCTS.filter((p) => norm([p.name, p.description, ...p.tags].join(" ")).includes(q));
-  }, [query, category]);
+    const list = !q
+      ? catalog.filter((p) => p.category === category)
+      : catalog.filter((p) => norm([p.name, p.description, ...p.tags].join(" ")).includes(q));
+    // Esgotados vão para o fim
+    return [...list].sort((a, b) => Number(b.available) - Number(a.available));
+  }, [query, category, catalog]);
 
   const count = client.cart.reduce((s, i) => s + i.qty, 0);
   const subtotal = client.cart.reduce((s, i) => s + i.unitPrice * i.qty, 0);
@@ -116,12 +128,12 @@ export function ClientApp() {
 
   const quickAdd = (p: Product, el: HTMLElement) => {
     const size = p.priceGigante ? "media" : undefined;
-    addToCart({ productId: p.id, name: p.name, emoji: p.emoji, size, extras: [], notes: "", qty: 1, unitPrice: unitPriceFor(p, size, []) });
+    addToCart({ productId: p.id, name: p.name, size, extras: [], notes: "", qty: 1, unitPrice: unitPriceFor(p, size, []) });
     fly(el, p.id, { title: "Adicionado ao pedido", subtitle: `${p.name}${size ? " • Média" : ""}`, icon: <DishArt spec={p.art} steam={false} className="h-7 w-7" /> });
   };
 
   const addCustom = (p: Product, c: Customization, el: HTMLElement) => {
-    addToCart({ productId: p.id, name: p.name, emoji: p.emoji, size: c.size, extras: c.extras, notes: c.notes, qty: c.qty, unitPrice: unitPriceFor(p, c.size, c.extras) });
+    addToCart({ productId: p.id, name: p.name, size: c.size, extras: c.extras, notes: c.notes, qty: c.qty, unitPrice: unitPriceFor(p, c.size, c.extras) });
     fly(el, p.id, { title: `${c.qty}x adicionado ao pedido`, subtitle: p.name, icon: <DishArt spec={p.art} steam={false} className="h-7 w-7" /> });
     setModal(null);
   };
@@ -133,19 +145,19 @@ export function ClientApp() {
 
   if (!ready) return <ClientSkeleton />;
 
-  const catLabel = CATEGORIES.find((c) => c.id === category)?.label;
+  const catLabel = sections.find((c) => c.id === category)?.name;
   const showSkeleton = !query && !catReady;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }} className="pb-36">
       <Header onOpenCart={() => openCart(client.cart.length || !tracked ? "cart" : "done")} onPickNeighborhood={() => setNbOpen(true)} />
       <Hero query={query} onQuery={setQuery} />
-      {!query && <Featured onOpen={setModal} onQuickAdd={quickAdd} />}
+      {!query && <Featured products={catalog} onOpen={setModal} onQuickAdd={quickAdd} />}
 
       <section className="mx-auto mt-8 max-w-6xl px-4 sm:px-6">
         {!query ? (
           <div className="sticky top-[calc(max(env(safe-area-inset-top),10px)+108px)] z-30 -mx-1 px-1 py-1 md:top-[calc(max(env(safe-area-inset-top),10px)+76px)]">
-            <CategoryTabs value={category} onChange={setCategory} />
+            <CategoryTabs sections={sections} value={category} onChange={setCategory} />
           </div>
         ) : (
           <p className="text-sm text-zinc-400">

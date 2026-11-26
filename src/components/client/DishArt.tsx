@@ -36,13 +36,15 @@ export function DishArt({ spec, className, steam = true }: { spec: DishArtSpec; 
       </defs>
 
       <ellipse cx="100" cy="152" rx="64" ry="6" fill="#000" opacity=".45" />
-      {steam && (spec.kind === "batatao" || spec.kind === "porcao") && <Steam />}
+      {steam && (spec.kind === "batatao" || spec.kind === "porcao" || spec.kind === "lanche" || spec.kind === "torre") && <Steam />}
 
       {spec.kind === "batatao" && <Batatao spec={spec} id={id} />}
       {spec.kind === "porcao" && <Porcao spec={spec} id={id} />}
       {spec.kind === "pote" && <Pote />}
       {spec.kind === "lata" && <Lata spec={spec} id={id} />}
       {spec.kind === "garrafa" && <Garrafa spec={spec} id={id} />}
+      {spec.kind === "lanche" && <Lanche spec={spec} />}
+      {spec.kind === "torre" && <Torre spec={spec} id={id} />}
     </svg>
   );
 }
@@ -234,6 +236,109 @@ function Garrafa({ spec, id }: { spec: Extract<DishArtSpec, { kind: "garrafa" }>
         {spec.label}
       </text>
       <rect x="80" y="54" width="5" height="88" rx="2.5" fill="#fff" opacity=".25" />
+    </g>
+  );
+}
+
+/** Faixa curva (camada de lanche) centrada em x=100. */
+const band = (y: number, h: number, hw: number, c = 8) =>
+  `M${100 - hw} ${y}Q100 ${y + c} ${100 + hw} ${y}L${100 + hw} ${y + h}Q100 ${y + h + c} ${100 - hw} ${y + h}Z`;
+
+function Lanche({ spec }: { spec: Extract<DishArtSpec, { kind: "lanche" }> }) {
+  const xis = spec.style === "xis";
+  const hw = xis ? 64 : 48;
+  const bun = xis ? "#E7A85A" : "#D98B3A";
+  return (
+    <g>
+      {/* pão de baixo */}
+      <path d={band(126, 14, hw - 2, 9)} fill="#B8722F" />
+      <path d={band(126, 4, hw - 2, 9)} fill="#E9B477" opacity=".6" />
+      {/* carne */}
+      <path d={band(xis ? 114 : 108, xis ? 12 : 18, hw + 2, 9)} fill="#4A230E" />
+      <path d={band(xis ? 114 : 108, 3, hw + 2, 9)} fill="#7A3D1A" opacity=".8" />
+      {spec.bacon &&
+        [-40, -14, 12, 38].map((dx, i) => (
+          <path key={i} d={`M${100 + dx - 12} ${110 + (i % 2) * 2}q6-5 12 0t12 0`} stroke="#9B3B1E" strokeWidth="4" fill="none" strokeLinecap="round" />
+        ))}
+      {spec.cheese && (
+        <g>
+          <path d={band(xis ? 106 : 100, 6, hw + 4, 9)} fill="#FBBF24" />
+          {[-34, -6, 22, 44].map((dx, i) => (
+            <path key={i} d={`M${100 + dx - 5} ${xis ? 112 : 106}l5 ${8 + (i % 2) * 4}l5 -${8 + (i % 2) * 4}Z`} fill="#FBBF24" />
+          ))}
+        </g>
+      )}
+      {spec.egg && (
+        <g>
+          <ellipse cx="128" cy="103" rx="18" ry="6" fill="#FFF7ED" />
+          <circle cx="126" cy="102" r="4.5" fill="#F59E0B" />
+        </g>
+      )}
+      {/* tomate + alface */}
+      <path d={band(xis ? 98 : 92, 5, hw - 4, 9)} fill="#DC2626" />
+      <path
+        d={`M${100 - hw - 2} ${xis ? 97 : 91}${Array.from({ length: 8 }, (_, i) => `q${(hw + 2) / 8} ${i % 2 ? 7 : -3} ${(hw + 2) / 4} 2`).join("")}`}
+        stroke="#65A30D"
+        strokeWidth="6"
+        fill="none"
+        strokeLinecap="round"
+      />
+      {/* pão de cima */}
+      {xis ? (
+        <g>
+          <path d={`M${100 - hw} 92C${100 - hw} 74 ${100 + hw} 74 ${100 + hw} 92Q100 102 ${100 - hw} 92Z`} fill={bun} />
+          {[-36, -12, 12, 36].map((dx, i) => (
+            <path key={i} d={`M${100 + dx - 10} 80l20 8`} stroke="#8A4A1C" strokeWidth="3" strokeLinecap="round" opacity=".7" />
+          ))}
+        </g>
+      ) : (
+        <g>
+          <path d={`M${100 - hw} 88C${100 - hw} 40 ${100 + hw} 40 ${100 + hw} 88Q100 96 ${100 - hw} 88Z`} fill={bun} />
+          <path d={`M${100 - hw + 10} 66C${100 - hw + 16} 50 ${100 - 6} 46 100 48`} stroke="#fff" strokeOpacity=".3" strokeWidth="4" fill="none" strokeLinecap="round" />
+          {[[86, 58], [104, 54], [118, 64], [94, 70], [112, 76], [78, 74], [124, 78]].map(([x, y], i) => (
+            <ellipse key={i} cx={x} cy={y} rx="2.6" ry="1.4" fill="#FEF3C7" transform={`rotate(${i * 25} ${x} ${y})`} />
+          ))}
+        </g>
+      )}
+    </g>
+  );
+}
+
+function Torre({ spec, id }: { spec: Extract<DishArtSpec, { kind: "torre" }>; id: IdFn }) {
+  const tiers: [number, number, number][] = [
+    // topo y, base y, meia-largura
+    [104, 142, 38],
+    [72, 108, 30],
+    [40, 76, 22],
+  ];
+  return (
+    <g>
+      <ellipse cx="100" cy="146" rx="60" ry="9" fill="#5B3416" />
+      <ellipse cx="100" cy="143" rx="60" ry="8" fill="#8B5A2B" />
+      {tiers.map(([top, base, hw], t) => (
+        <g key={t}>
+          {Array.from({ length: Math.floor((hw * 2) / 7) }, (_, i) => {
+            const x = 100 - hw + 4 + i * 7;
+            const a = ((i * 13 + t * 7) % 11) - 5;
+            return (
+              <rect key={i} x={x - 3.5} y={top + ((i * 5) % 6)} width="7" height={base - top} rx="2" fill={`url(#${id("fry")})`} stroke="#C9781A" strokeOpacity=".5" strokeWidth=".8" transform={`rotate(${a} ${x} ${base})`} />
+            );
+          })}
+        </g>
+      ))}
+      {spec.sauce && (
+        <g fill="none" stroke={spec.sauce} strokeLinecap="round">
+          <path d="M80 44C88 38 98 50 106 42S118 40 120 46" strokeWidth="7" />
+          <path d="M72 80C84 72 96 88 108 78S124 74 128 82" strokeWidth="6" />
+          <path d="M64 112C78 104 92 120 106 110S128 106 136 114" strokeWidth="6" />
+          <path d="M84 46v14M118 82v12M74 114v14M126 116v10" strokeWidth="4" />
+        </g>
+      )}
+      {spec.toppings.length > 0 && (
+        <g transform="translate(0 6) scale(1 1.2) translate(0 -14)">
+          <Toppings toppings={spec.toppings} />
+        </g>
+      )}
     </g>
   );
 }

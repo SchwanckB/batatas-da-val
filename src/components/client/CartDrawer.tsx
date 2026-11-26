@@ -14,7 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Press, spring } from "@/components/ui/Press";
 import { Sheet } from "@/components/ui/Sheet";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
-import { extraById, neighborhoodById, productById, SIZES } from "@/lib/data";
+import { extraById, findProduct, neighborhoodById, SIZES } from "@/lib/data";
 import { ProductArt } from "./ProductArt";
 import { cn, money, STORE } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -149,7 +149,7 @@ export function CartDrawer({ open, view, setView, onClose }: Props) {
                           className="overflow-hidden"
                         >
                           <div className="glass flex gap-3 rounded-2xl p-3">
-                            {(() => { const p = productById(i.productId); return p ? <ProductArt product={p} compact className="h-14 w-14 shrink-0 rounded-control" /> : null; })()}
+                            {(() => { const p = findProduct(shared.products, i.productId); return p ? <ProductArt product={p} compact className="h-14 w-14 shrink-0 rounded-control" /> : null; })()}
                             <div className="min-w-0 flex-1">
                               <p className="text-sm font-bold leading-snug text-white">{i.name}</p>
                               <p className="mt-0.5 text-xs text-zinc-400">

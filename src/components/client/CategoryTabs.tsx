@@ -1,24 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CupSoda, Crown, Flame, UtensilsCrossed } from "lucide-react";
-import { CATEGORIES } from "@/lib/data";
-import type { CategoryId } from "@/lib/types";
+import { SECTION_ICONS } from "@/components/ui/sectionIcons";
 import { cn } from "@/lib/format";
+import type { CategoryId, Section } from "@/lib/types";
 
-const icons: Record<CategoryId, typeof Flame> = {
-  tradicionais: Flame,
-  especiais: Crown,
-  porcoes: UtensilsCrossed,
-  bebidas: CupSoda,
-};
-
-export function CategoryTabs({ value, onChange }: { value: CategoryId; onChange: (c: CategoryId) => void }) {
+export function CategoryTabs({ sections, value, onChange }: { sections: Section[]; value: CategoryId; onChange: (c: CategoryId) => void }) {
   return (
     <div className="glass no-scrollbar flex gap-1 overflow-x-auto rounded-full p-1.5">
-      {CATEGORIES.map((c) => {
+      {sections.map((c) => {
         const active = c.id === value;
-        const Icon = icons[c.id];
+        const Icon = SECTION_ICONS[c.icon]?.Icon ?? SECTION_ICONS.star.Icon;
         return (
           <button
             key={c.id}
@@ -36,10 +28,7 @@ export function CategoryTabs({ value, onChange }: { value: CategoryId; onChange:
               />
             )}
             <Icon className="relative h-4 w-4" strokeWidth={2} />
-            <span className="relative whitespace-nowrap">
-              <span className="sm:hidden">{c.short}</span>
-              <span className="hidden sm:inline">{c.label}</span>
-            </span>
+            <span className="relative whitespace-nowrap">{c.name}</span>
           </button>
         );
       })}

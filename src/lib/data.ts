@@ -1,20 +1,24 @@
 import type {
   CartItem,
-  CategoryId,
   Extra,
   Ingredient,
   Neighborhood,
   Order,
   Product,
+  Section,
   SharedState,
   SizeId,
+  TintKey,
 } from "./types";
 
-export const CATEGORIES: { id: CategoryId; label: string; short: string }[] = [
-  { id: "tradicionais", label: "Batatões Tradicionais", short: "Tradicionais" },
-  { id: "especiais", label: "Batatões Especiais", short: "Especiais" },
-  { id: "porcoes", label: "Porções & Extras", short: "Porções" },
-  { id: "bebidas", label: "Bebidas", short: "Bebidas" },
+export const SEED_SECTIONS: Section[] = [
+  { id: "tradicionais", name: "Batatões Tradicionais", icon: "flame", active: true, order: 0 },
+  { id: "especiais", name: "Batatões Especiais", icon: "crown", active: true, order: 1 },
+  { id: "torres", name: "Torres de Batata", icon: "layers", active: false, order: 2 },
+  { id: "xis", name: "Xis", icon: "sandwich", active: false, order: 3 },
+  { id: "hamburgueres", name: "Hambúrgueres", icon: "beef", active: false, order: 4 },
+  { id: "porcoes", name: "Porções & Extras", icon: "utensils", active: true, order: 5 },
+  { id: "bebidas", name: "Bebidas", icon: "soda", active: true, order: 6 },
 ];
 
 export const SIZES: { id: SizeId; label: string; weight: string }[] = [
@@ -37,14 +41,16 @@ export const NEIGHBORHOODS: Neighborhood[] = [
   { id: "retirada", name: "Retirada no local", hint: "Busque quentinho!", fee: 0, eta: "20–25 min", pickup: true },
 ];
 
-const T = {
-  gold: "from-amber-500/30 via-orange-600/20 to-transparent",
-  red: "from-rose-600/30 via-red-700/20 to-transparent",
-  cream: "from-yellow-200/25 via-amber-500/15 to-transparent",
-  bev: "from-sky-500/20 via-rose-500/15 to-transparent",
+/** Fundos da vitrine de cada produto. */
+export const TINTS: Record<TintKey, { label: string; cls: string; swatch: string }> = {
+  gold: { label: "Dourado", cls: "from-amber-500/30 via-orange-600/20 to-transparent", swatch: "#F59E0B" },
+  red: { label: "Brasa", cls: "from-rose-600/30 via-red-700/20 to-transparent", swatch: "#E11D48" },
+  cream: { label: "Creme", cls: "from-yellow-200/25 via-amber-500/15 to-transparent", swatch: "#FDE68A" },
+  bev: { label: "Gelado", cls: "from-sky-500/20 via-rose-500/15 to-transparent", swatch: "#38BDF8" },
+  green: { label: "Fresco", cls: "from-lime-500/20 via-emerald-700/15 to-transparent", swatch: "#84CC16" },
 };
 
-export const PRODUCTS: Product[] = [
+export const SEED_PRODUCTS: Product[] = [
   // Tradicionais
   {
     id: "strogonoff",
@@ -56,9 +62,9 @@ export const PRODUCTS: Product[] = [
     priceGigante: 44,
     badges: ["Mais Pedido"],
     tags: ["carne", "strogonoff", "requeijão", "batata palha"],
-    emoji: "🥩",
     art: { kind: "batatao", sauce: "#C98A54", sauce2: "#F3E3C3", toppings: ["carne", "palha", "ervas"] },
-    tint: T.gold,
+    tint: "gold",
+    available: true,
     allowsExtras: true,
     featured: true,
     recipe: { batata: 0.3, strogonoff: 0.2, catupiry: 0.05, palha: 0.15, embalagem: 1 },
@@ -74,9 +80,9 @@ export const PRODUCTS: Product[] = [
     priceGigante: 42,
     badges: ["Mais Pedido"],
     tags: ["frango", "catupiry", "mussarela"],
-    emoji: "🍗",
     art: { kind: "batatao", sauce: "#F4E6C8", sauce2: "#F7D774", toppings: ["frango", "ervas"] },
-    tint: T.cream,
+    tint: "cream",
+    available: true,
     allowsExtras: true,
     featured: true,
     recipe: { batata: 0.3, frango: 0.2, catupiry: 0.08, mussarela: 0.05, embalagem: 1 },
@@ -92,9 +98,9 @@ export const PRODUCTS: Product[] = [
     priceGigante: 43,
     badges: [],
     tags: ["cheddar", "bacon"],
-    emoji: "🥓",
     art: { kind: "batatao", sauce: "#F59E0B", toppings: ["bacon", "ervas"] },
-    tint: T.red,
+    tint: "red",
+    available: true,
     allowsExtras: true,
     recipe: { batata: 0.3, cheddar: 0.1, bacon: 0.08, embalagem: 1 },
     recipeGigante: { batata: 0.5, cheddar: 0.15, bacon: 0.12, embalagem: 1 },
@@ -110,9 +116,9 @@ export const PRODUCTS: Product[] = [
     priceGigante: 54,
     badges: ["Especial da Casa", "Serve 2 pessoas"],
     tags: ["strogonoff", "frango", "cheddar", "catupiry", "bacon", "batata palha", "carne"],
-    emoji: "👑",
     art: { kind: "batatao", sauce: "#F4E6C8", sauce2: "#F59E0B", toppings: ["carne", "frango", "bacon", "palha", "ervas"] },
-    tint: T.gold,
+    tint: "gold",
+    available: true,
     allowsExtras: true,
     featured: true,
     recipe: { batata: 0.35, strogonoff: 0.12, frango: 0.12, cheddar: 0.06, catupiry: 0.06, bacon: 0.06, palha: 0.15, embalagem: 1 },
@@ -128,9 +134,9 @@ export const PRODUCTS: Product[] = [
     priceGigante: 49,
     badges: ["Novo"],
     tags: ["queijo", "mussarela", "catupiry", "cheddar", "requeijão"],
-    emoji: "🧀",
     art: { kind: "batatao", sauce: "#FBE7A1", sauce2: "#F59E0B", toppings: ["queijo", "ervas"] },
-    tint: T.cream,
+    tint: "cream",
+    available: true,
     allowsExtras: true,
     featured: true,
     recipe: { batata: 0.3, mussarela: 0.08, catupiry: 0.08, cheddar: 0.08, embalagem: 1 },
@@ -146,9 +152,9 @@ export const PRODUCTS: Product[] = [
     priceGigante: 50,
     badges: ["Novo"],
     tags: ["frango", "bacon", "catupiry", "cheddar", "batata palha"],
-    emoji: "🔥",
     art: { kind: "batatao", sauce: "#F4E6C8", sauce2: "#F59E0B", toppings: ["frango", "bacon", "palha"] },
-    tint: T.red,
+    tint: "red",
+    available: true,
     allowsExtras: true,
     recipe: { batata: 0.3, frango: 0.18, catupiry: 0.06, bacon: 0.06, cheddar: 0.05, palha: 0.1, embalagem: 1 },
     recipeGigante: { batata: 0.5, frango: 0.28, catupiry: 0.1, bacon: 0.1, cheddar: 0.08, palha: 0.2, embalagem: 1 },
@@ -162,9 +168,9 @@ export const PRODUCTS: Product[] = [
     price: 22,
     badges: ["Serve 2 pessoas"],
     tags: ["batata frita", "porção", "maionese"],
-    emoji: "🍟",
     art: { kind: "porcao", toppings: [] },
-    tint: T.gold,
+    tint: "gold",
+    available: true,
     allowsExtras: true,
     recipe: { batata: 0.5, embalagem: 1 },
   },
@@ -176,9 +182,9 @@ export const PRODUCTS: Product[] = [
     price: 29,
     badges: ["Serve 2 pessoas", "Mais Pedido"],
     tags: ["cheddar", "bacon", "porção"],
-    emoji: "🧆",
     art: { kind: "porcao", sauce: "#F59E0B", toppings: ["bacon"] },
-    tint: T.red,
+    tint: "red",
+    available: true,
     allowsExtras: true,
     recipe: { batata: 0.5, cheddar: 0.1, bacon: 0.08, embalagem: 1 },
   },
@@ -190,9 +196,9 @@ export const PRODUCTS: Product[] = [
     price: 4,
     badges: [],
     tags: ["maionese", "molho", "extra"],
-    emoji: "🥫",
     art: { kind: "pote" },
-    tint: T.cream,
+    tint: "cream",
+    available: true,
     allowsExtras: false,
     recipe: {},
   },
@@ -205,9 +211,9 @@ export const PRODUCTS: Product[] = [
     price: 6.5,
     badges: [],
     tags: ["refrigerante", "coca"],
-    emoji: "🥤",
     art: { kind: "lata", color: "#DC2626", label: "COLA" },
-    tint: T.bev,
+    tint: "bev",
+    available: true,
     allowsExtras: false,
     recipe: {},
   },
@@ -219,9 +225,9 @@ export const PRODUCTS: Product[] = [
     price: 15,
     badges: ["Serve 2 pessoas"],
     tags: ["refrigerante", "coca"],
-    emoji: "🍾",
     art: { kind: "garrafa", color: "#DC2626", liquid: "#2B0F08", label: "COLA" },
-    tint: T.bev,
+    tint: "bev",
+    available: true,
     allowsExtras: false,
     recipe: {},
   },
@@ -233,9 +239,9 @@ export const PRODUCTS: Product[] = [
     price: 13,
     badges: [],
     tags: ["refrigerante", "guaraná"],
-    emoji: "🧃",
     art: { kind: "garrafa", color: "#15803D", liquid: "#7A2E0E", label: "GUARANÁ" },
-    tint: T.bev,
+    tint: "bev",
+    available: true,
     allowsExtras: false,
     recipe: {},
   },
@@ -247,15 +253,74 @@ export const PRODUCTS: Product[] = [
     price: 4,
     badges: [],
     tags: ["água"],
-    emoji: "💧",
     art: { kind: "garrafa", color: "#0EA5E9", liquid: "#BAE6FD", label: "ÁGUA" },
-    tint: T.bev,
+    tint: "bev",
+    available: true,
     allowsExtras: false,
     recipe: {},
   },
+  // Torres (seção desativada por padrão)
+  {
+    id: "torre-classica",
+    name: "Torre de Batata Cheddar & Bacon",
+    description: "Uma torre de fritas crocantes em camadas, banhada em cheddar cremoso e bacon. Perfeita para dividir.",
+    category: "torres",
+    price: 49,
+    badges: ["Novo", "Serve 2 pessoas"],
+    tags: ["torre", "cheddar", "bacon"],
+    art: { kind: "torre", sauce: "#F59E0B", toppings: ["bacon", "ervas"] },
+    tint: "gold",
+    available: true,
+    allowsExtras: true,
+    recipe: { batata: 0.9, cheddar: 0.18, bacon: 0.12, embalagem: 1 },
+  },
+  // Xis (seção desativada por padrão)
+  {
+    id: "xis-salada",
+    name: "Xis Salada",
+    description: "Pão de xis prensado, hambúrguer, queijo, presunto, ovo, alface, tomate, milho e ervilha.",
+    category: "xis",
+    price: 28,
+    badges: [],
+    tags: ["xis", "lanche", "salada"],
+    art: { kind: "lanche", style: "xis", cheese: true, egg: true },
+    tint: "green",
+    available: true,
+    allowsExtras: true,
+    recipe: { mussarela: 0.05, embalagem: 1 },
+  },
+  {
+    id: "xis-bacon",
+    name: "Xis Bacon",
+    description: "O xis completo com muito bacon crocante, queijo derretido e maionese da casa.",
+    category: "xis",
+    price: 32,
+    badges: ["Mais Pedido"],
+    tags: ["xis", "lanche", "bacon"],
+    art: { kind: "lanche", style: "xis", cheese: true, bacon: true },
+    tint: "red",
+    available: true,
+    allowsExtras: true,
+    recipe: { mussarela: 0.05, bacon: 0.08, embalagem: 1 },
+  },
+  // Hambúrgueres (seção desativada por padrão)
+  {
+    id: "burger-cheddar",
+    name: "Cheddar Burger",
+    description: "Pão brioche, blend 160g, cheddar cremoso e cebola caramelizada.",
+    category: "hamburgueres",
+    price: 29,
+    badges: ["Novo"],
+    tags: ["hambúrguer", "burger", "cheddar"],
+    art: { kind: "lanche", style: "burger", cheese: true },
+    tint: "gold",
+    available: true,
+    allowsExtras: true,
+    recipe: { cheddar: 0.05, embalagem: 1 },
+  },
 ];
 
-export const productById = (id: string) => PRODUCTS.find((p) => p.id === id);
+export const findProduct = (products: Product[], id: string) => products.find((p) => p.id === id);
 export const extraById = (id: string) => EXTRAS.find((e) => e.id === id);
 export const neighborhoodById = (id: string | null) => NEIGHBORHOODS.find((n) => n.id === id);
 
@@ -280,12 +345,11 @@ export const stockLevel = (i: Ingredient): StockLevel =>
   i.qty < i.min ? "critico" : i.qty < i.min * 2 ? "atencao" : "ok";
 
 function item(productId: string, qty: number, size?: SizeId, extras: string[] = [], notes = ""): CartItem {
-  const p = productById(productId)!;
+  const p = findProduct(SEED_PRODUCTS, productId)!;
   return {
     uid: `${productId}-${Math.random().toString(36).slice(2, 7)}`,
     productId,
     name: p.name,
-    emoji: p.emoji,
     size: p.priceGigante ? size ?? "media" : undefined,
     extras,
     notes,
@@ -324,7 +388,7 @@ function order(
   };
 }
 
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 2;
 
 export function createSeed(): SharedState {
   return {
@@ -333,6 +397,8 @@ export function createSeed(): SharedState {
     openingFloat: 100,
     stock: INITIAL_STOCK.map((i) => ({ ...i })),
     cash: [],
+    sections: SEED_SECTIONS.map((x) => ({ ...x })),
+    products: SEED_PRODUCTS.map((x) => ({ ...x })),
     orders: [
       order(
         1042,
@@ -376,11 +442,11 @@ export function createSeed(): SharedState {
 }
 
 /** Insumos consumidos por um pedido (receita × quantidade + adicionais). */
-export function orderConsumption(o: Order) {
+export function orderConsumption(o: Order, products: Product[]) {
   const use: Partial<Record<Ingredient["id"], number>> = {};
   const add = (id: Ingredient["id"], v: number) => (use[id] = (use[id] ?? 0) + v);
   for (const it of o.items) {
-    const p = productById(it.productId);
+    const p = findProduct(products, it.productId);
     if (!p) continue;
     const recipe = it.size === "gigante" && p.recipeGigante ? p.recipeGigante : p.recipe;
     for (const [k, v] of Object.entries(recipe)) add(k as Ingredient["id"], (v ?? 0) * it.qty);

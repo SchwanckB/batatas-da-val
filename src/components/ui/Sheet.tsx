@@ -25,10 +25,12 @@ interface SheetProps {
   side?: "center" | "right";
   className?: string;
   label: string;
+  /** Modal largo no desktop (formulários com duas colunas). */
+  wide?: boolean;
 }
 
 /** Modal / Drawer em Liquid Glass com abertura orgânica (mola) e arraste para fechar no celular. */
-export function Sheet({ open, onClose, children, side = "center", className, label }: SheetProps) {
+export function Sheet({ open, onClose, children, side = "center", className, label, wide }: SheetProps) {
   const desktop = useIsDesktop();
   const drag = useDragControls();
 
@@ -86,7 +88,7 @@ export function Sheet({ open, onClose, children, side = "center", className, lab
               desktop
                 ? side === "right"
                   ? "inset-y-3 right-3 w-[440px] rounded-panel"
-                  : "pointer-events-auto relative max-h-[88vh] w-full max-w-[560px] rounded-panel"
+                  : cn("pointer-events-auto relative max-h-[90vh] w-full rounded-panel", wide ? "max-w-[920px]" : "max-w-[560px]")
                 : "inset-x-0 bottom-0 max-h-[92dvh] rounded-t-panel pb-[env(safe-area-inset-bottom)]",
               className,
             )}

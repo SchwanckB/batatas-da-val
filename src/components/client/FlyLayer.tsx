@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { productById } from "@/lib/data";
+import { findProduct } from "@/lib/data";
+import { useStore } from "@/lib/store";
 import { DishArt } from "./DishArt";
 
 export interface Flight {
@@ -15,6 +16,7 @@ export interface Flight {
 
 /** Miniatura dourada voando em curva até o carrinho. */
 export function FlyLayer({ flights, onDone }: { flights: Flight[]; onDone: (id: string) => void }) {
+  const { shared } = useStore();
   return (
     <div className="pointer-events-none fixed inset-0 z-[95]">
       <AnimatePresence>
@@ -37,7 +39,7 @@ export function FlyLayer({ flights, onDone }: { flights: Flight[]; onDone: (id: 
               transition={{ duration: 0.75, ease: [0.45, 0, 0.25, 1], times: [0, 0.45, 1] }}
               onAnimationComplete={() => onDone(f.id)}
             >
-              {(() => { const p = productById(f.productId); return p ? <DishArt spec={p.art} steam={false} className="h-8 w-8" /> : null; })()}
+              {(() => { const p = findProduct(shared.products, f.productId); return p ? <DishArt spec={p.art} steam={false} className="h-8 w-8" /> : null; })()}
             </motion.div>
           );
         })}
