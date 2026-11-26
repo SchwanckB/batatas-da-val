@@ -70,7 +70,7 @@ export function StorePanel() {
             <p className="text-small text-zinc-400">
               {draft.paused
                 ? "O cardápio continua visível, mas ninguém consegue finalizar."
-                : `Agora: ${status.label.toLowerCase()}.`}
+                : `Agora: ${status.label}.`}
             </p>
           </div>
           <Switch
@@ -232,13 +232,13 @@ export function StorePanel() {
                     />
                   </span>
                 ) : (
-                  <span className="text-small text-zinc-500">fechado</span>
+                  <span className="text-small text-zinc-500">Fechado</span>
                 )}
               </div>
             );
           })}
         </div>
-        <p className="mt-3 text-small tnum text-zinc-400">No site vai aparecer: {hoursSummary(draft)}</p>
+        <p className="mt-3 text-small text-zinc-400">No site vai aparecer: {hoursSummary(draft)}</p>
       </Card>
 
       {/* Pedido e preparo */}

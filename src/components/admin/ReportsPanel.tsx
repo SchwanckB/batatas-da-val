@@ -157,13 +157,13 @@ export function ReportsPanel() {
 
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Stat Icon={TrendingUp} label="Faturamento" value={money(data.revenue)} hint={`${data.sold.length} pedidos pagos`} accent="text-amber-300" />
-        <Stat Icon={Receipt} label="Ticket médio" value={money(data.ticket)} hint="por pedido concluído" />
-        <Stat Icon={ShoppingBag} label="Pedidos no período" value={String(data.all.length)} hint={`pico às ${peakHour}h`} />
+        <Stat Icon={Receipt} label="Ticket médio" value={money(data.ticket)} hint="Por pedido concluído" />
+        <Stat Icon={ShoppingBag} label="Pedidos no período" value={String(data.all.length)} hint={`Pico às ${peakHour}h`} />
         <Stat
           Icon={data.rated.length ? Star : XCircle}
           label={data.rated.length ? "Nota média" : "Cancelados"}
           value={data.rated.length ? `${data.avgStars.toFixed(1)} de 5` : String(data.canceled.length)}
-          hint={data.rated.length ? `${data.rated.length} avaliações` : "no período"}
+          hint={data.rated.length ? `${data.rated.length} avaliações` : "No período"}
           accent={data.rated.length ? "text-white" : "text-[#ffb3aa]"}
         />
       </div>
@@ -235,7 +235,7 @@ export function ReportsPanel() {
             </ol>
           ) : (
             <div className="mt-4">
-              <Empty>Sem produtos vendidos no período.</Empty>
+              <Empty>Nenhum produto vendido no período.</Empty>
             </div>
           )}
         </Card>
@@ -280,7 +280,7 @@ export function ReportsPanel() {
               ))}
             </ul>
           ) : (
-            <p className="mt-3 text-small text-zinc-500">Sem entregas concluídas no período.</p>
+            <p className="mt-3 text-small text-zinc-500">Nenhuma entrega concluída no período.</p>
           )}
         </Card>
       </div>

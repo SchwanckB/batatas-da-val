@@ -6,7 +6,7 @@ import { Logo } from "@/components/ui/Logo";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import { findNeighborhood } from "@/lib/data";
 import { money, waLink } from "@/lib/format";
-import { hoursSummary, type StoreSchedule } from "@/lib/hours";
+import { hoursLines, type StoreSchedule } from "@/lib/hours";
 import type { Neighborhood, StoreSettings } from "@/lib/types";
 
 const fadeUp = (d: number) => ({
@@ -28,16 +28,18 @@ function deliveryFacts(settings: StoreSchedule, neighborhoods: Neighborhood[]) {
       value:
         cheapest && dearest
           ? cheapest.fee === dearest.fee
-            ? `${money(cheapest.fee)} em toda a cidade`
-            : `${cheapest.name} ${money(cheapest.fee)}, ${dearest.name.toLowerCase()} ${money(dearest.fee)}`
-          : "combine pelo WhatsApp",
+            ? [`${money(cheapest.fee)} em toda a cidade`]
+            : [`${cheapest.name} ${money(cheapest.fee)}`, `${dearest.name} ${money(dearest.fee)}`]
+          : ["Combine pelo WhatsApp"],
     },
     {
       label: "Retirada",
-      value: retirada ? `sem taxa, pronto em ${retirada.etaMin}–${retirada.etaMax} min` : "fale com a gente",
+      value: retirada
+        ? [`Sem taxa, pronto em ${retirada.etaMin} a ${retirada.etaMax} minutos`]
+        : ["Combine pelo WhatsApp"],
     },
-    { label: "Atendimento", value: hoursSummary(settings) },
-    { label: "Pagamento", value: "Pix, cartão na entrega ou dinheiro" },
+    { label: "Atendimento", value: hoursLines(settings) },
+    { label: "Pagamento", value: ["Pix, cartão na entrega ou dinheiro"] },
   ];
 }
 
@@ -109,7 +111,13 @@ export function Hero({
         {facts.map((f) => (
           <div key={f.label} className="flex items-baseline gap-3 border-b border-line py-2.5">
             <dt className="w-24 shrink-0 text-small text-zinc-400">{f.label}</dt>
-            <dd className="text-small font-semibold text-zinc-100">{f.value}</dd>
+            <dd className="text-small font-semibold text-zinc-100">
+              {f.value.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+            </dd>
           </div>
         ))}
       </motion.dl>

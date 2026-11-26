@@ -87,7 +87,7 @@ export function OrderPage({ token }: { token: string }) {
         </Link>
         <Logo size={40} />
         <div className="min-w-0">
-          <p className="letreiro truncate text-xl text-white">{data?.store.name ?? "Batatas da Val"}</p>
+          <p className="font-bold truncate text-lg text-white">{data?.store.name ?? "Batatas da Val"}</p>
           <p className="text-2xs text-zinc-400">Acompanhamento do pedido</p>
         </div>
       </div>
@@ -115,7 +115,7 @@ export function OrderPage({ token }: { token: string }) {
       {data && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-8 space-y-4">
           <div>
-            <h1 className="letreiro text-3xl text-white">Pedido #{data.order.id}</h1>
+            <h1 className="font-bold text-2xl text-white">Pedido #{data.order.id}</h1>
             <p className="mt-1 text-small tnum text-zinc-400">{dateTimeFmt(data.order.createdAt)}</p>
           </div>
 
@@ -157,7 +157,7 @@ export function OrderPage({ token }: { token: string }) {
             ))}
             <li className="flex justify-between border-t border-line pt-2 text-zinc-400">
               <span>Entrega</span>
-              <span className="tnum">{data.order.deliveryFee ? money(data.order.deliveryFee) : "sem taxa"}</span>
+              <span className="tnum">{data.order.deliveryFee ? money(data.order.deliveryFee) : "Sem taxa"}</span>
             </li>
             {data.order.discount > 0 && (
               <li className="flex justify-between text-[#7fd79a]">

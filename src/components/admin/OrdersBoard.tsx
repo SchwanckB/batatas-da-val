@@ -31,10 +31,10 @@ import { Comanda } from "./Comanda";
 import { inputCls } from "./kit";
 
 const COLUMNS: { id: OrderStatus; title: string; sub: string; Icon: typeof Inbox; dot: string }[] = [
-  { id: "novo", title: "Novos", sub: "aceitar e começar", Icon: Inbox, dot: "bg-brasa" },
-  { id: "preparo", title: "Em preparo", sub: "na chapa e na fritura", Icon: ChefHat, dot: "bg-gold" },
-  { id: "entrega", title: "Em entrega", sub: "na rua ou no balcão", Icon: Bike, dot: "bg-[#5a9bd8]" },
-  { id: "concluido", title: "Concluídos", sub: "turno atual", Icon: PackageCheck, dot: "bg-aberto" },
+  { id: "novo", title: "Novos", sub: "Aceitar e começar o preparo", Icon: Inbox, dot: "bg-brasa" },
+  { id: "preparo", title: "Em preparo", sub: "Na fritura, quase saindo", Icon: ChefHat, dot: "bg-gold" },
+  { id: "entrega", title: "Em entrega", sub: "Na rua ou no balcão", Icon: Bike, dot: "bg-[#5a9bd8]" },
+  { id: "concluido", title: "Concluídos", sub: "Turno atual", Icon: PackageCheck, dot: "bg-aberto" },
 ];
 
 const MOTIVOS = [
@@ -125,7 +125,7 @@ export function OrdersBoard() {
                           err
                             ? { title: "Não salvou", subtitle: err, tone: "erro" }
                             : {
-                                title: `#${o.id}: ${a.label.toLowerCase()}`,
+                                title: `Pedido #${o.id}: ${a.label}`,
                                 subtitle: o.status === "novo" ? "Insumos baixados do estoque" : o.customer.name,
                                 icon: <a.Icon className="h-4.5 w-4.5 text-amber-300" />,
                               },
@@ -285,7 +285,7 @@ function OrderCard({
       <div className="mt-3 flex items-center justify-between gap-2 text-xs">
         <span className="rounded-full bg-white/[0.06] px-2 py-0.5 font-medium tnum text-zinc-300">
           {paymentLabel(o.payment)}
-          {o.payment === "dinheiro" && o.changeFor ? `, troco ${money(o.changeFor)}` : ""}
+          {o.payment === "dinheiro" && o.changeFor ? `, troco para ${money(o.changeFor)}` : ""}
         </span>
         <span className="font-bold tnum text-white">{money(o.total)}</span>
       </div>
@@ -363,7 +363,7 @@ function CancelSheet({
       {order && (
         <div className="space-y-4 p-5 pt-4 sm:p-6">
           <div>
-            <h2 className="letreiro pr-10 text-2xl text-white">Cancelar #{order.id}</h2>
+            <h2 className="font-bold pr-10 text-xl text-white">Cancelar #{order.id}</h2>
             <p className="mt-1 text-small text-zinc-400">
               {order.customer.name}, {money(order.total)}.{" "}
               {order.stockDeducted

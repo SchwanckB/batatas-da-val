@@ -80,9 +80,9 @@ export function CouponsPanel() {
                       {c.minOrder > 0 && `, mínimo ${money(c.minOrder)}`}
                     </p>
                     <p className="mt-0.5 text-2xs tnum text-zinc-500">
-                      {c.uses} {c.uses === 1 ? "uso" : "usos"}
+                      {c.uses === 0 ? "Ainda não usado" : `Usado ${c.uses} ${c.uses === 1 ? "vez" : "vezes"}`}
                       {c.maxUses > 0 && ` de ${c.maxUses}`}
-                      {c.expiresAt && `, até ${dateFmt(c.expiresAt)}`}
+                      {c.expiresAt && `, válido até ${dateFmt(c.expiresAt)}`}
                     </p>
                   </div>
                   <button
@@ -180,7 +180,7 @@ function CouponEditor({
             if (valid) onSave({ ...d, code });
           }}
         >
-          <h2 className="letreiro pr-10 text-2xl text-white">{exists ? "Editar cupom" : "Novo cupom"}</h2>
+          <h2 className="font-bold pr-10 text-xl text-white">{exists ? "Editar cupom" : "Novo cupom"}</h2>
 
           <Field
             label="Código"
@@ -262,7 +262,7 @@ function CouponEditor({
           <div className="flex items-center justify-between rounded-control border border-line px-4 py-3">
             <div>
               <p className="text-sm font-semibold text-white">Aceitar agora</p>
-              <p className="text-2xs tnum text-zinc-500">Já usado {d.uses}x</p>
+              <p className="text-2xs tnum text-zinc-500">Usado {d.uses} {d.uses === 1 ? "vez" : "vezes"}</p>
             </div>
             <Switch label="Aceitar agora" checked={d.active} onChange={(v) => set({ active: v })} />
           </div>

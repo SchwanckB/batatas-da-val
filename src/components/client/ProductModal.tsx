@@ -61,7 +61,7 @@ export function ProductModal({ product, extrasList, onClose, onAdd }: Props) {
                     ))}
                   </div>
                 )}
-                <h2 className="letreiro pr-8 text-3xl text-white">{p.name}</h2>
+                <h2 className="font-bold pr-8 text-2xl text-white">{p.name}</h2>
                 <p className="mt-2.5 text-sm leading-relaxed text-zinc-300">{p.description}</p>
               </div>
 

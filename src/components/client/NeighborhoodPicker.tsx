@@ -50,7 +50,7 @@ export function NeighborhoodList({
               </span>
             </span>
             <span className={cn("shrink-0 text-sm font-bold tnum", n.fee ? "text-amber-300" : "text-[#7fd79a]")}>
-              {n.fee ? money(n.fee) : "sem taxa"}
+              {n.fee ? money(n.fee) : "Sem taxa"}
             </span>
             {on && <Check className="h-4 w-4 shrink-0 text-amber-300" aria-hidden />}
           </motion.button>

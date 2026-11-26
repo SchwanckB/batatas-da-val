@@ -29,7 +29,6 @@ export function Featured({
         <h2 id="mais-pedidos" className="letreiro text-2xl text-white sm:text-3xl">
           Os mais pedidos
         </h2>
-        <p className="pb-1 text-small text-zinc-400">saem toda noite</p>
       </div>
 
       <ul className="no-scrollbar mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:px-6">
@@ -53,8 +52,7 @@ export function Featured({
                     {i + 1}
                   </span>
                 </div>
-                <p className="mt-2.5 truncate text-sm font-bold text-white">{p.name}</p>
-                <p className="mt-0.5 line-clamp-1 text-2xs text-zinc-400">{p.description}</p>
+                <p className="mt-2.5 line-clamp-2 min-h-10 text-sm font-bold leading-snug text-white">{p.name}</p>
               </button>
 
               <div className="mt-2 flex items-center justify-between gap-2">

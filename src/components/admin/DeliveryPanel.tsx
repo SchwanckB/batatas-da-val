@@ -122,9 +122,9 @@ function Neighborhoods() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-bold text-white">{n.name}</p>
-                    <p className="truncate text-2xs text-zinc-500">{n.hint || "sem descrição"}</p>
+                    <p className="truncate text-2xs text-zinc-500">{n.hint || "Sem descrição"}</p>
                     <p className="mt-0.5 text-sm font-bold tnum text-amber-300">
-                      {n.fee ? money(n.fee) : "sem taxa"}
+                      {n.fee ? money(n.fee) : "Sem taxa"}
                       <span className="ml-1.5 text-2xs font-medium text-zinc-500">{etaLabel(n)}</span>
                     </p>
                   </div>
@@ -165,7 +165,7 @@ function Neighborhoods() {
           toast(
             err
               ? { title: "Não salvou", subtitle: err, tone: "erro" }
-              : { title: "Área salva", subtitle: `${n.name}, ${n.fee ? money(n.fee) : "sem taxa"}`, icon: <Check className="h-4.5 w-4.5 text-[#7fd79a]" /> },
+              : { title: "Área salva", subtitle: `${n.name}, ${n.fee ? money(n.fee) : "Sem taxa"}`, icon: <Check className="h-4.5 w-4.5 text-[#7fd79a]" /> },
           );
         }}
         onDelete={async (n) => {
@@ -212,7 +212,7 @@ function NeighborhoodEditor({
             if (valid) onSave({ ...d, name: d.name.trim(), hint: d.hint.trim() });
           }}
         >
-          <h2 className="letreiro pr-10 text-2xl text-white">{exists ? "Editar área" : "Nova área"}</h2>
+          <h2 className="font-bold pr-10 text-xl text-white">{exists ? "Editar área" : "Nova área"}</h2>
 
           <Field label="Nome" hint="É o que o cliente vê na lista.">
             <input
@@ -323,7 +323,7 @@ function Extras() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold text-white">{e.name}</p>
                   <p className="truncate text-2xs text-zinc-500">
-                    {ing ? `baixa ${e.amount} ${ing.unit} de ${ing.name}` : "sem baixa de estoque"}
+                    {ing ? `Baixa ${e.amount} ${ing.unit} de ${ing.name}` : "Sem baixa de estoque"}
                   </p>
                   <p className="mt-0.5 text-sm font-bold tnum text-amber-300">+{money(e.price)}</p>
                 </div>
@@ -406,7 +406,7 @@ function ExtraEditor({
             if (valid) onSave({ ...d, name: d.name.trim(), id: exists ? d.id : `ex-${slug(d.name) || uid()}` });
           }}
         >
-          <h2 className="letreiro pr-10 text-2xl text-white">{exists ? "Editar adicional" : "Novo adicional"}</h2>
+          <h2 className="font-bold pr-10 text-xl text-white">{exists ? "Editar adicional" : "Novo adicional"}</h2>
 
           <Field label="Nome">
             <input

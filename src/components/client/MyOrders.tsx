@@ -35,7 +35,7 @@ export function MyOrders({
   return (
     <Sheet open={open} onClose={onClose} side="right" label="Meus pedidos">
       <div className="px-5 pb-3 pt-4 sm:pt-5">
-        <h2 className="letreiro pr-10 text-2xl text-white">Meus pedidos</h2>
+        <h2 className="font-bold pr-10 text-xl text-white">Meus pedidos</h2>
         <p className="mt-1 text-small text-zinc-400">Guardados neste aparelho, sem precisar de cadastro.</p>
       </div>
 

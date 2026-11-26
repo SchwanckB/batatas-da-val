@@ -135,18 +135,20 @@ export function hoursLines(settings: StoreSchedule): string[] {
   if (!groups.length) return ["Horários a definir"];
   return groups
     .map((g) => {
+      const first = DAY_NAMES[g.days[0]];
+      const last = DAY_NAMES[g.days[g.days.length - 1]];
       const span =
         g.days.length === 1
-          ? DAY_SHORT[g.days[0]]
+          ? first
           : g.days.length === 2
-            ? `${DAY_SHORT[g.days[0]]} e ${DAY_SHORT[g.days[1]]}`
-            : `${DAY_SHORT[g.days[0]]} a ${DAY_SHORT[g.days[g.days.length - 1]]}`;
-      return `${span} ${g.h.from}–${g.h.to}`;
+            ? `${first} e ${last.toLowerCase()}`
+            : `${first} a ${last.toLowerCase()}`;
+      return `${span}, das ${g.h.from} às ${g.h.to}`;
     });
 }
 
 /** Mesma informação em uma linha, para espaços apertados. */
-export const hoursSummary = (settings: StoreSchedule) => hoursLines(settings).join(", ");
+export const hoursSummary = (settings: StoreSchedule) => hoursLines(settings).join(". ");
 
 /** openingHoursSpecification do schema.org (JSON-LD). */
 export function openingHoursSchema(settings: StoreSchedule) {

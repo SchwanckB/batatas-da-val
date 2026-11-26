@@ -36,13 +36,13 @@ export const SEED_SETTINGS: StoreSettings = {
     6: { open: true, from: "19:30", to: "00:30" },
   },
   paused: false,
-  pausedMessage: "Estamos com a cozinha lotada. Já voltamos a aceitar pedidos!",
+  pausedMessage: "Estamos com muitos pedidos neste momento. Em instantes voltamos a atender.",
   minOrder: 0,
   prepMinutes: 25,
   notices: [
     {
       id: "demanda",
-      text: "Sexta e sábado a cozinha enche: os pedidos podem levar um pouco mais.",
+      text: "Sexta e sábado costumam ter mais pedidos. O preparo pode levar um pouco mais.",
       tone: "aviso",
       active: false,
     },
@@ -75,8 +75,8 @@ export const SEED_EXTRAS: Extra[] = [
 export const SEED_NEIGHBORHOODS: Neighborhood[] = [
   { id: "centro", name: "Centro", hint: "Três Cachoeiras", fee: 5, etaMin: 30, etaMax: 40, active: true, order: 0 },
   { id: "proximos", name: "Bairros próximos", hint: "Até 3 km do centro", fee: 7, etaMin: 35, etaMax: 50, active: true, order: 1 },
-  { id: "interior", name: "Interior / Outros", hint: "Localidades do interior", fee: 10, etaMin: 45, etaMax: 60, active: true, order: 2 },
-  { id: "retirada", name: "Retirada no local", hint: "Busque quentinho", fee: 0, etaMin: 20, etaMax: 25, pickup: true, active: true, order: 3 },
+  { id: "interior", name: "Interior", hint: "Localidades do interior e arredores", fee: 10, etaMin: 45, etaMax: 60, active: true, order: 2 },
+  { id: "retirada", name: "Retirada no local", hint: "Retire no balcão da loja", fee: 0, etaMin: 20, etaMax: 25, pickup: true, active: true, order: 3 },
 ];
 
 export const SEED_COUPONS: Coupon[] = [
@@ -233,7 +233,7 @@ export const SEED_PRODUCTS: Product[] = [
   {
     id: "molho-casa",
     name: "Pote de Maionese da Casa",
-    description: "Maionese temperada artesanal da Val (100ml).",
+    description: "Maionese temperada artesanal da casa, pote de 100 ml.",
     category: "porcoes",
     price: 4,
     badges: [],

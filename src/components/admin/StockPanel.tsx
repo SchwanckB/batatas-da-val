@@ -14,9 +14,9 @@ import type { Ingredient } from "@/lib/types";
 import { Field, NumberField, inputCls } from "./kit";
 
 const LEVEL: Record<StockLevel, { label: string; bar: string; chip: string; Icon: typeof CircleCheck }> = {
-  ok: { label: "no ponto", bar: "bg-aberto", chip: "bg-aberto/15 text-[#7fd79a]", Icon: CircleCheck },
-  atencao: { label: "atenção", bar: "bg-gold", chip: "bg-amber-400/15 text-amber-300", Icon: TriangleAlert },
-  critico: { label: "crítico", bar: "bg-brasa", chip: "bg-brasa/15 text-[#ff8f82]", Icon: OctagonX },
+  ok: { label: "No ponto", bar: "bg-aberto", chip: "bg-aberto/15 text-[#7fd79a]", Icon: CircleCheck },
+  atencao: { label: "Atenção", bar: "bg-gold", chip: "bg-amber-400/15 text-amber-300", Icon: TriangleAlert },
+  critico: { label: "Crítico", bar: "bg-brasa", chip: "bg-brasa/15 text-[#ff8f82]", Icon: OctagonX },
 };
 
 const UNITS: Ingredient["unit"][] = ["kg", "l", "pct", "un"];
@@ -86,7 +86,7 @@ export function StockPanel() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-bold text-white">{i.name}</p>
                   <p className="mt-0.5 text-2xs tnum text-zinc-500">
-                    mínimo {qtyFmt(i.min, i.unit)}, capacidade {qtyFmt(i.max, i.unit)}
+                    Mínimo {qtyFmt(i.min, i.unit)}, capacidade {qtyFmt(i.max, i.unit)}
                   </p>
                 </div>
                 {can("stock:save") && (
@@ -225,7 +225,7 @@ function IngredientEditor({
             onSave({ ...d, name: d.name.trim(), id: exists ? d.id : slug(d.name) || `ing-${uid()}` });
           }}
         >
-          <h2 className="letreiro pr-10 text-2xl text-white">{exists ? "Editar insumo" : "Novo insumo"}</h2>
+          <h2 className="font-bold pr-10 text-xl text-white">{exists ? "Editar insumo" : "Novo insumo"}</h2>
 
           <Field label="Nome">
             <input

@@ -372,7 +372,7 @@ export function ClientApp() {
 
       <Sheet open={nbOpen} onClose={() => setNbOpen(false)} label="Escolha seu bairro">
         <div className="p-5 pt-4 sm:p-6">
-          <h2 className="letreiro flex items-center gap-2 pr-10 text-2xl text-white">
+          <h2 className="font-bold flex items-center gap-2 pr-10 text-xl text-white">
             <MapPin className="h-5 w-5 text-amber-400" aria-hidden /> Onde você está?
           </h2>
           <p className="mb-4 mt-1.5 text-sm text-zinc-400">
@@ -407,7 +407,7 @@ function Footer() {
         <p className="max-w-md text-sm text-zinc-400">{settings.slogan}</p>
 
         <dl className="mt-4 grid w-full max-w-md gap-x-6 text-left sm:grid-cols-2">
-          <div className="flex items-baseline gap-3 border-b border-line py-2">
+          <div className="flex items-baseline gap-3 border-b border-line py-2 sm:col-span-2">
             <dt className="w-20 shrink-0 text-small text-zinc-500">Horário</dt>
             <dd className="text-small tnum text-zinc-200">
               {hoursLines(settings).map((l) => (
@@ -422,7 +422,7 @@ function Footer() {
             <dd className="text-small tnum text-zinc-200">{settings.phone}</dd>
           </div>
           <div className="flex items-baseline gap-3 border-b border-line py-2">
-            <dt className="w-20 shrink-0 text-small text-zinc-500">Onde</dt>
+            <dt className="w-20 shrink-0 text-small text-zinc-500">Endereço</dt>
             <dd className="text-small text-zinc-200">{settings.address || settings.city}</dd>
           </div>
           <div className="flex items-baseline gap-3 border-b border-line py-2">

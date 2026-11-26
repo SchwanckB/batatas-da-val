@@ -61,7 +61,7 @@ export function LoginForm({
       >
         <div className="flex flex-col items-center text-center">
           <Logo size={76} />
-          <h1 className="letreiro mt-5 text-3xl text-white">Painel da Val</h1>
+          <h1 className="font-bold mt-5 text-2xl text-white">Painel da Val</h1>
           <p className="mt-1 text-small text-zinc-400">Pedidos, cardápio, caixa e estoque.</p>
         </div>
 

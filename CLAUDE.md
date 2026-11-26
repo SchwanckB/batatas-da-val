@@ -78,18 +78,23 @@ A cara é de **cardápio de esquina impresso**, não de landing page. Tokens em
 - **Cores**: preto quente `bg-ink` / `bg-surface`, faixa creme `.papel` para o cardápio,
   dourado da marca (`gold`, ou `amber-300/400/500`, que apontam para ele), `brasa` **só** para
   erro e alerta, `aberto` para o selo de atendimento. Nada de hex solto.
-- **Tipografia**: `.letreiro` (Anton, caixa alta) para títulos; Instrument Sans no corpo;
-  `.tnum` em todo número (preço, total, horário).
-- **Superfícies**: `.panel` e `.panel-strong` — sólidas. Vidro translúcido, bolha flutuante e
-  texto com gradiente **não existem mais**: eram o que dava cara de template de IA.
-- **Botões**: `<Press variant="cta|gold|panel|outline|ghost|danger">`. O dourado é chapado com
-  borda inferior sólida (`.btn-gold`), nunca com brilho.
-- **Raios**: `rounded-control` (10px), `rounded-card` (14px), `rounded-panel` (20px).
+- **Tipografia**: `.letreiro` (Anton, caixa alta) **só nos momentos de marca** — nome da loja,
+  título do herói, "Cardápio" e os nomes das seções. Título de tela, de gaveta e de card usa o
+  corpo em negrito, em caixa normal. Instrument Sans no corpo; `.tnum` em todo número.
+- **Superfícies**: `.panel` e `.panel-strong` — vidro quente (blur + degradê sutil sobre o preto
+  da marca). Bolha flutuante no fundo e texto com gradiente **não existem**: eram o que dava
+  cara de template de IA.
+- **Botões**: `<Press variant="cta|gold|panel|outline|ghost|danger">`. O dourado (`.btn-gold`) tem
+  degradê curto, borda inferior sólida e um brilho quente discreto — nada de néon.
+- **Raios**: `rounded-control` (12px), `rounded-card` (18px), `rounded-panel` (24px).
   Não crie `rounded-[Npx]` nem `text-[Npx]` novos — crie token se precisar.
 - **Cardápio**: lista com linha pontilhada (`.guia`) até o preço, não grade de cards iguais.
 - **Animações**: mantenha. Mola `stiffness 400 / damping 25` (`spring` em `Press.tsx`), item
   voando até a sacola, toasts, skeletons fiéis ao layout.
 - **Sem emojis** na interface; use ícones Lucide ou `DishArt`.
+- **Texto**: toda frase visível começa com maiúscula, inclusive rótulo curto e valor de lista
+  ("Sem taxa", "Turno atual", "Por pedido concluído"). Nada de tom de conversa jogada
+  ("fale com a gente"): escreva como um comércio que se leva a sério.
 - Evite rótulos em CAIXA ALTA espaçada e sequências `A · B · C`: use estrutura (linhas, filetes).
 - Texto secundário mínimo `text-zinc-400`. Alvos de toque ≥ 44px. Testar em 390px e 1440px.
 

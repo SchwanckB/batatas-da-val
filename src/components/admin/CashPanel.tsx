@@ -118,7 +118,7 @@ export function CashPanel() {
           <span className="grid h-14 w-14 place-items-center rounded-full border border-line text-zinc-400">
             <LockKeyhole className="h-6 w-6" aria-hidden />
           </span>
-          <p className="letreiro text-2xl text-white">Caixa fechado</p>
+          <p className="font-bold text-xl text-white">Caixa fechado</p>
           <p className="max-w-sm text-sm text-zinc-400">
             Abra o turno informando o fundo de troco. A partir daí tudo que entrar e sair é contado aqui.
           </p>
@@ -148,9 +148,9 @@ export function CashPanel() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-small text-zinc-400">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-aberto/15 px-3 py-1.5 font-semibold text-[#7fd79a]">
-          <Wallet className="h-3.5 w-3.5" aria-hidden /> turno aberto desde {timeFmt(shift.openedAt)}
+          <Wallet className="h-3.5 w-3.5" aria-hidden /> Turno aberto desde {timeFmt(shift.openedAt)}
         </span>
-        <span className="tnum">por {shift.openedBy}</span>
+        <span>Aberto por {shift.openedBy}</span>
         <Press variant="panel" className="ml-auto h-10 px-4 text-sm" onClick={exportCSV}>
           <Download className="h-4 w-4" aria-hidden /> CSV do turno
         </Press>
@@ -164,21 +164,21 @@ export function CashPanel() {
           Icon={TrendingUp}
           label="Faturamento do turno"
           value={money(stats.revenue)}
-          hint={`${money(stats.pending)} em aberto`}
+          hint={`${money(stats.pending)} ainda em aberto`}
           accent="text-amber-300"
         />
         <Stat
           Icon={ShoppingBag}
           label="Pedidos no turno"
           value={String(stats.total)}
-          hint={`${stats.done.length} concluídos, ${stats.openOrders.length} em andamento`}
+          hint={`${stats.done.length} concluídos e ${stats.openOrders.length} em andamento`}
         />
-        <Stat Icon={Receipt} label="Ticket médio" value={money(stats.ticket)} hint="por pedido concluído" />
+        <Stat Icon={Receipt} label="Ticket médio" value={money(stats.ticket)} hint="Por pedido concluído" />
         <Stat
           Icon={Vault}
           label="Esperado na gaveta"
           value={money(stats.drawer)}
-          hint={`fundo ${money(stats.floatValue)}`}
+          hint={`Fundo de troco ${money(stats.floatValue)}`}
           accent="text-[#7fd79a]"
         />
       </div>
@@ -339,9 +339,9 @@ function ShiftHistory() {
           return (
             <li key={s.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-b border-line py-2 last:border-0">
               <span className="text-small tnum text-zinc-300">{dateTimeFmt(s.openedAt)}</span>
-              <span className="text-2xs text-zinc-500">até {s.closedAt ? timeFmt(s.closedAt) : "—"}</span>
-              <span className="text-2xs text-zinc-500">por {s.closedBy ?? s.openedBy}</span>
-              <span className="ml-auto text-small font-semibold tnum text-zinc-200">contado {money(diff)}</span>
+              <span className="text-2xs text-zinc-500">Até {s.closedAt ? timeFmt(s.closedAt) : "—"}</span>
+              <span className="text-2xs text-zinc-500">Fechado por {s.closedBy ?? s.openedBy}</span>
+              <span className="ml-auto text-small font-semibold tnum text-zinc-200">Contado {money(diff)}</span>
               {s.note && <span className="w-full text-2xs text-zinc-500">{s.note}</span>}
             </li>
           );
@@ -370,7 +370,7 @@ function OpenShiftSheet({
           onConfirm(value);
         }}
       >
-        <h2 className="letreiro pr-10 text-2xl text-white">Abrir o caixa</h2>
+        <h2 className="font-bold pr-10 text-xl text-white">Abrir o caixa</h2>
         <MoneyField
           label="Fundo de troco"
           hint="Quanto em dinheiro está na gaveta agora."
@@ -409,7 +409,7 @@ function CloseShiftSheet({
           onConfirm(counted, note.trim());
         }}
       >
-        <h2 className="letreiro pr-10 text-2xl text-white">Fechar o caixa</h2>
+        <h2 className="font-bold pr-10 text-xl text-white">Fechar o caixa</h2>
         <p className="text-small text-zinc-400">
           O sistema espera <b className="tnum text-white">{money(expected)}</b> em dinheiro na gaveta. Conte e informe o
           valor real.
@@ -471,7 +471,7 @@ function EntryForm({
           setAmount(0);
         }}
       >
-        <h2 className="letreiro flex items-center gap-2 pr-10 text-2xl text-white">
+        <h2 className="font-bold flex items-center gap-2 pr-10 text-xl text-white">
           {type === "reforco" ? (
             <ArrowUpCircle className="h-5 w-5 text-[#7fd79a]" aria-hidden />
           ) : (

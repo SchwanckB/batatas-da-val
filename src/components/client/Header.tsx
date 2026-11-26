@@ -50,8 +50,8 @@ export function Header({
             </span>
             <span className="block text-2xs tnum text-zinc-400">
               {neighborhood
-                ? `${neighborhood.fee ? money(neighborhood.fee) : "sem taxa"} em ${etaLabel(neighborhood)}`
-                : "ver frete e tempo"}
+                ? `${neighborhood.fee ? money(neighborhood.fee) : "Sem taxa"} em ${etaLabel(neighborhood)}`
+                : "Ver frete e prazo"}
             </span>
           </span>
           <ChevronDown className="h-3.5 w-3.5 text-zinc-400" aria-hidden />
@@ -109,7 +109,7 @@ export function Header({
           {neighborhood ? `Entregar em ${neighborhood.name}` : "Escolha onde você está"}
         </span>
         <span className="ml-auto shrink-0 tnum text-zinc-400">
-          {neighborhood ? `${neighborhood.fee ? money(neighborhood.fee) : "sem taxa"} • ${etaLabel(neighborhood)}` : "frete e tempo"}
+          {neighborhood ? `${neighborhood.fee ? money(neighborhood.fee) : "Sem taxa"} em ${etaLabel(neighborhood)}` : "Ver frete e prazo"}
         </span>
         <ChevronDown className="h-3.5 w-3.5 shrink-0 text-zinc-500" aria-hidden />
       </button>

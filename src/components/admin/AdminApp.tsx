@@ -66,9 +66,9 @@ const MODULES: ModuleDef[] = [
   { id: "cardapio", label: "Cardápio", title: "Cardápio", sub: "Seções, produtos e preços", Icon: BookOpen, roles: ["dono"], primary: true },
   { id: "caixa", label: "Caixa", title: "Caixa", sub: "Turno, formas de pagamento e gaveta", Icon: Wallet, roles: ["dono", "caixa"], primary: true },
   { id: "estoque", label: "Estoque", title: "Estoque", sub: "Insumos e reposição", Icon: Boxes, roles: ["dono", "cozinha", "caixa"], primary: true },
-  { id: "entrega", label: "Entrega", title: "Entrega e adicionais", sub: "Bairros, fretes, tempos e extras", Icon: Truck, roles: ["dono"] },
+  { id: "entrega", label: "Entrega", title: "Entrega e adicionais", sub: "Áreas, fretes, prazos e adicionais", Icon: Truck, roles: ["dono"] },
   { id: "cupons", label: "Cupons", title: "Cupons de desconto", sub: "Códigos, validade e limites", Icon: Ticket, roles: ["dono"] },
-  { id: "relatorios", label: "Relatórios", title: "Relatórios", sub: "Vendas, campeões e horários de pico", Icon: ChartNoAxesColumn, roles: ["dono"] },
+  { id: "relatorios", label: "Relatórios", title: "Relatórios", sub: "Vendas, produtos e horários de pico", Icon: ChartNoAxesColumn, roles: ["dono"] },
   { id: "loja", label: "Loja", title: "Configurações da loja", sub: "Horários, avisos, Pix e pausa", Icon: Store, roles: ["dono"] },
   { id: "equipe", label: "Equipe", title: "Equipe e histórico", sub: "Acessos, papéis e alterações", Icon: Users, roles: ["dono"] },
 ];
@@ -223,7 +223,7 @@ function AdminShell() {
           <div className="flex items-center gap-3 px-1">
             <Logo size={42} />
             <div className="min-w-0 leading-tight">
-              <p className="letreiro truncate text-lg text-white">{state.settings.name}</p>
+              <p className="font-bold truncate text-lg text-white">{state.settings.name}</p>
               <p className="text-2xs text-zinc-500">Painel</p>
             </div>
           </div>
@@ -254,9 +254,7 @@ function AdminShell() {
               </span>
               <span className="min-w-0 flex-1 leading-tight">
                 <span className="block truncate text-xs font-semibold text-white">{session.name}</span>
-                <span className="block truncate text-2xs text-zinc-500">
-                  {session.role === "dono" ? "dono" : session.role}
-                </span>
+                <span className="block truncate text-2xs capitalize text-zinc-500">{session.role}</span>
               </span>
               <button
                 onClick={logout}
@@ -283,7 +281,7 @@ function AdminShell() {
               transition={{ duration: 0.18 }}
               className="min-w-0"
             >
-              <h1 className="letreiro truncate text-2xl text-white sm:text-3xl">{current?.title}</h1>
+              <h1 className="font-bold truncate text-xl text-white sm:text-3xl">{current?.title}</h1>
               <p className="truncate text-xs text-zinc-500 sm:text-small">{current?.sub}</p>
             </motion.div>
           </AnimatePresence>
@@ -291,7 +289,7 @@ function AdminShell() {
           <div className="ml-auto flex shrink-0 items-center gap-2">
             {offline && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-brasa/15 px-3 py-1.5 text-2xs font-semibold text-[#ffb3aa]">
-                <WifiOff className="h-3.5 w-3.5" aria-hidden /> sem conexão
+                <WifiOff className="h-3.5 w-3.5" aria-hidden /> Sem conexão
               </span>
             )}
             <button
@@ -349,7 +347,7 @@ function AdminShell() {
 
       <Sheet open={moreOpen} onClose={() => setMoreOpen(false)} label="Outros módulos">
         <div className="p-5 pt-4">
-          <h2 className="letreiro pr-10 text-2xl text-white">Configuração</h2>
+          <h2 className="font-bold pr-10 text-xl text-white">Configuração</h2>
           <div className="mt-4 grid gap-2">
             {secondary.map((m) => (
               <button

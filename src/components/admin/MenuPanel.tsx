@@ -113,10 +113,10 @@ function SectionsList({ onOpenSection }: { onOpenSection: (id: string) => void }
                       <p className="truncate font-bold text-white">{s.name}</p>
                       <p className="flex items-center gap-1.5 text-2xs text-zinc-400">
                         {count} produto{count === 1 ? "" : "s"}
-                        {s.active && empty && <span className="text-amber-300">• sem produtos, não aparece</span>}
+                        {s.active && empty && <span className="text-amber-300">— sem produtos, ainda não aparece</span>}
                         {!s.active && (
                           <span className="inline-flex items-center gap-1">
-                            • <EyeOff className="h-3 w-3" /> oculta
+                            — <EyeOff className="h-3 w-3" /> oculta no cardápio
                           </span>
                         )}
                       </p>
@@ -139,7 +139,7 @@ function SectionsList({ onOpenSection }: { onOpenSection: (id: string) => void }
                             });
                         }}
                       />
-                      <span className="text-2xs font-semibold text-zinc-500">{s.active ? "visível" : "oculta"}</span>
+                      <span className="text-2xs font-semibold text-zinc-500">{s.active ? "Visível" : "Oculta"}</span>
                     </div>
                   </div>
                 </Spotlight>
@@ -207,7 +207,7 @@ function SectionEditor({
             if (valid) onSave({ ...d, name: d.name.trim() });
           }}
         >
-          <h2 className="letreiro pr-10 text-2xl text-white">{exists ? "Editar seção" : "Nova seção"}</h2>
+          <h2 className="font-bold pr-10 text-xl text-white">{exists ? "Editar seção" : "Nova seção"}</h2>
           <input autoFocus value={d.name} onChange={(e) => set({ name: e.target.value })} maxLength={32} placeholder="Ex.: Xis, Hambúrgueres, Torres de Batata" className="w-full rounded-control border border-line bg-ink px-4 py-3 text-white placeholder:text-zinc-500 focus:border-amber-400/60 focus:outline-none" />
           <div className="space-y-2">
             <p className="text-small font-semibold text-zinc-200">Ícone</p>
@@ -288,7 +288,7 @@ function ProductsList({ filter, setFilter, onEdit }: { filter: string; setFilter
                     <p className="truncate font-bold text-white">{p.name}</p>
                     <p className="truncate text-2xs text-zinc-400">
                       {sectionName(p.category)}
-                      {p.featured && <span className="text-amber-300"> • Destaque</span>}
+                      {p.featured && <span className="text-amber-300"> — em destaque</span>}
                     </p>
                     <p className="mt-0.5 text-sm font-extrabold text-amber-300">
                       {money(p.price)}
@@ -297,7 +297,7 @@ function ProductsList({ filter, setFilter, onEdit }: { filter: string; setFilter
                   </div>
                   <div className="flex flex-col items-center gap-0.5">
                     <Switch size="sm" label={`${p.name} disponível`} checked={p.available} onChange={(v) => saveProduct({ ...p, available: v })} />
-                    <span className={cn("text-2xs font-semibold", p.available ? "text-zinc-500" : "text-[#ff8f82]")}>{p.available ? "ativo" : "esgotado"}</span>
+                    <span className={cn("text-2xs font-semibold", p.available ? "text-zinc-500" : "text-[#ff8f82]")}>{p.available ? "À venda" : "Esgotado"}</span>
                   </div>
                 </div>
               </Spotlight>

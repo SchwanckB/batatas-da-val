@@ -160,7 +160,7 @@ export function CartDrawer({ open, view, setView, onClose }: Props) {
             <ArrowLeft className="h-4 w-4" aria-hidden />
           </button>
         )}
-        <h2 className="letreiro pr-10 text-2xl text-white">{title}</h2>
+        <h2 className="font-bold pr-10 text-xl text-white">{title}</h2>
       </div>
 
       <div className="relative flex min-h-0 flex-1 flex-col">
@@ -469,7 +469,7 @@ export function CartDrawer({ open, view, setView, onClose }: Props) {
                 <Totals totals={totals} nbName={neighborhood?.name} couponCode={coupon?.code} />
                 {neighborhood && status.open && (
                   <p className="text-small tnum text-zinc-400">
-                    {pickup ? "Pronto para retirar em " : "Chega em "}
+                    {pickup ? "Fica pronto em " : "Chega em "}
                     {etaRange(settings.prepMinutes, neighborhood.etaMin, neighborhood.etaMax)}
                   </p>
                 )}
@@ -526,7 +526,7 @@ export function CartDrawer({ open, view, setView, onClose }: Props) {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.25 }}
-                      className="letreiro mt-4 text-3xl text-white"
+                      className="font-bold mt-4 text-2xl text-white"
                     >
                       {tracked.status === "concluido" ? "Bom apetite" : "Pedido confirmado"}
                     </motion.h3>
@@ -622,7 +622,7 @@ function Totals({
       <div className="flex justify-between text-zinc-400">
         <span>Entrega{nbName ? ` em ${nbName}` : " (escolha o bairro)"}</span>
         <span className={cn("tnum", totals.fee === 0 && nbName && "text-[#7fd79a]")}>
-          {nbName ? (totals.fee ? money(totals.fee) : "sem taxa") : "—"}
+          {nbName ? (totals.fee ? money(totals.fee) : "Sem taxa") : "—"}
         </span>
       </div>
       {totals.discount > 0 && (

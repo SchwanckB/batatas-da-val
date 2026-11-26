@@ -156,7 +156,7 @@ export function ProductEditor({ product, onClose }: { product: Product | null; o
             <div className="grid gap-6 p-5 pt-4 sm:p-6 md:grid-cols-[300px_1fr]">
               {/* Prévia + aparência */}
               <aside className="space-y-4 md:sticky md:top-0 md:self-start">
-                <h2 className="letreiro pr-10 text-2xl text-white">{isNew ? "Novo produto" : "Editar produto"}</h2>
+                <h2 className="font-bold pr-10 text-xl text-white">{isNew ? "Novo produto" : "Editar produto"}</h2>
                 <div className="panel overflow-hidden rounded-card p-3">
                   <ProductArt product={d} className="h-44 w-full rounded-control" big />
                   <div className="px-1 pb-1 pt-3">
