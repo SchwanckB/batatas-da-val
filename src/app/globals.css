@@ -36,10 +36,10 @@
   --color-brasa: #d33a2c; /* só erro, alerta e estado crítico */
   --color-aberto: #41b263;
 
-  /* Raios: menores e mais "impressos" */
-  --radius-control: 0.625rem; /* 10px — inputs, botões */
-  --radius-card: 0.875rem; /* 14px — cards */
-  --radius-panel: 1.25rem; /* 20px — painéis, header, modais */
+  /* Raios: meio-termo entre o cardápio impresso e o acabamento do app */
+  --radius-control: 0.75rem; /* 12px — inputs, botões */
+  --radius-card: 1.125rem; /* 18px — cards */
+  --radius-panel: 1.5rem; /* 24px — painéis, gavetas, modais */
 
   /* Dourados do Tailwind apontando para a marca (unifica todo `amber-*`) */
   --color-amber-200: #ffdb92;
@@ -99,23 +99,27 @@ body {
 
 /* ============================================================
    SUPERFÍCIES
-   Sólidas e quentes. O vidro translúcido saiu: ele era o maior
-   responsável pelo ar de template.
+   O vidro do visual anterior volta aqui — mas quente, mais opaco e
+   sem o exagero de brilho que deixava tudo com ar de template.
    ============================================================ */
 .panel {
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
+  background: linear-gradient(180deg, rgb(58 48 38 / 0.5), rgb(33 28 22 / 0.72));
+  border: 1px solid rgb(255 236 210 / 0.1);
   box-shadow:
-    inset 0 1px 0 rgb(255 248 238 / 0.06),
-    0 2px 0 rgb(0 0 0 / 0.25);
+    inset 0 1px 0 rgb(255 240 214 / 0.08),
+    0 10px 30px -18px rgb(0 0 0 / 0.85);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .panel-strong {
-  background: var(--color-ink-2);
-  border: 1px solid var(--color-line);
+  background: linear-gradient(180deg, rgb(43 36 28 / 0.94), rgb(26 22 17 / 0.96));
+  border: 1px solid rgb(255 236 210 / 0.12);
   box-shadow:
-    inset 0 1px 0 rgb(255 248 238 / 0.07),
-    0 14px 40px -18px rgb(0 0 0 / 0.9);
+    inset 0 1px 0 rgb(255 240 214 / 0.1),
+    0 24px 70px -24px rgb(0 0 0 / 0.95);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
 }
 
 /* Header e gavetas continuam com um leve blur: ali ele serve para leitura */
@@ -143,17 +147,21 @@ body {
   border-bottom-color: rgb(26 22 17 / 0.28);
 }
 
-/* Realce de hover discreto e quente (substitui o antigo "spotlight" de IA) */
+/* Luz quente que acompanha o cursor — herança do visual anterior, só que contida */
 .spotlight {
   position: relative;
   isolation: isolate;
-  background: var(--color-surface);
-  border: 1px solid var(--color-line);
   border-radius: var(--radius-card);
+  background: linear-gradient(180deg, rgb(58 48 38 / 0.5), rgb(33 28 22 / 0.72));
+  border: 1px solid rgb(255 236 210 / 0.1);
+  box-shadow:
+    inset 0 1px 0 rgb(255 240 214 / 0.08),
+    0 10px 30px -18px rgb(0 0 0 / 0.85);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
   transition:
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 .spotlight::before {
   content: "";
@@ -162,12 +170,18 @@ body {
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.25s ease;
-  background: linear-gradient(180deg, rgb(245 165 36 / 0.07), transparent 55%);
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 50%),
+    rgb(245 165 36 / 0.1),
+    transparent 60%
+  );
 }
 .spotlight:hover {
-  border-color: color-mix(in oklab, var(--color-gold) 45%, var(--color-line));
-  box-shadow: 0 10px 24px -16px rgb(0 0 0 / 0.9);
+  border-color: rgb(245 165 36 / 0.35);
+  box-shadow:
+    inset 0 1px 0 rgb(255 240 214 / 0.1),
+    0 16px 36px -20px rgb(0 0 0 / 0.95);
 }
 .spotlight:hover::before {
   opacity: 1;
@@ -177,18 +191,23 @@ body {
    BOTÕES "adesivo": dourado chapado com borda inferior sólida
    ============================================================ */
 .btn-gold {
-  background: var(--color-gold);
+  background: linear-gradient(180deg, var(--color-gold-soft), var(--color-gold));
   color: var(--color-on-brand);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.35),
-    0 2px 0 var(--color-gold-deep);
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    0 2px 0 var(--color-gold-deep),
+    0 10px 26px -10px rgb(245 165 36 / 0.6);
 }
 .btn-gold:hover {
-  background: var(--color-gold-soft);
+  background: linear-gradient(180deg, #ffd176, var(--color-gold-soft));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 2px 0 var(--color-gold-deep),
+    0 14px 32px -10px rgb(245 165 36 / 0.75);
 }
 .btn-gold:active {
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
     0 1px 0 var(--color-gold-deep);
 }
 
